@@ -1,0 +1,3 @@
+/home/jathushan/Desktop/VascuSynth/Build/CMakeFiles/rebuild_cache.dir
+/home/jathushan/Desktop/VascuSynth/Build/CMakeFiles/edit_cache.dir
+/home/jathushan/Desktop/VascuSynth/Build/CMakeFiles/VascuSynth.dir

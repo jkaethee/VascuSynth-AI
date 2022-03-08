@@ -1,0 +1,5 @@
+TESTING VASCUSYNTH
+
+To create a test volume using the parameter files in this folder once VascuSynth has been built and compiled (in the source directory), issue the following command:
+
+../Source/VascuSynth paramFiles.txt imageNames.txt 0.04 testNoise.txt
