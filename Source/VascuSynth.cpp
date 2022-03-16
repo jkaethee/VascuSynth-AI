@@ -191,6 +191,7 @@ VascularTree * buildTree(const char * filename){
 	double voxelWidth;
 	int closestNeighbours;
 	int randomSeed = -1;
+	bool tumour;
 	string line;
     string supplyMapFileName;
     string oxygenMapFileName;
@@ -212,6 +213,7 @@ VascularTree * buildTree(const char * filename){
     bool closestNeighboursSet = false;
     bool supplyMapFileNameSet = false;
     bool oxygenMapFileNameSet = false;
+	bool tumourSet = false;
 	
 	vector<string> *mapFilesLines = readFileLines(filename);
     int size = (int) mapFilesLines->size();
@@ -318,15 +320,16 @@ VascularTree * buildTree(const char * filename){
 			 
 			randomSeed = atoi(value.c_str());
 			
-		} else {
-			
+		} else if (name.compare("TUMOUR") == 0) {
+			tumour = atoi(value.c_str());
+			tumourSet = true;
 		}
 		
 		
 	}
         
     //make sure that we have everything defined
-    if (perfSet && pperfSet && ptermSet && qperfSet && rhoSet && gammaSet && lambdaSet && muSet && minDistanceSet && numNodesSet && voxelWidthSet && closestNeighboursSet && supplyMapFileNameSet && oxygenMapFileNameSet) {
+    if (perfSet && pperfSet && ptermSet && qperfSet && rhoSet && gammaSet && lambdaSet && muSet && minDistanceSet && numNodesSet && voxelWidthSet && closestNeighboursSet && supplyMapFileNameSet && oxygenMapFileNameSet && tumourSet) {
     
         //load the supply map
         sm = new SupplyMap();
@@ -350,7 +353,7 @@ VascularTree * buildTree(const char * filename){
 
         //TODO: should probably check and make sure everything is defined
         //and throw an error if it is not (and catch the error in the main function)
-        VascularTree *vt = new VascularTree(om, perf, pperf, pterm, qperf, rho, gamma, lambda, mu, minDistance, numNodes, voxelWidth, closestNeighbours);
+        VascularTree *vt = new VascularTree(om, perf, pperf, pterm, qperf, rho, gamma, lambda, mu, minDistance, numNodes, voxelWidth, closestNeighbours, tumour);
         vt->buildTree();
         
         return vt;

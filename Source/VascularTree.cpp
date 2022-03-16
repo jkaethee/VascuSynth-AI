@@ -61,7 +61,7 @@ using namespace std;
 /**  
  * 	Constructor
  */				
-VascularTree::VascularTree(OxygenationMap * _oxMap, double* _perf, double _Pperf, double _Pterm, double _Qperf, double _rho, double _gamma, double _lambda, double _mu, double _minDistance, int _numNodes, double _voxelWidth, int _closestNeighbours){
+VascularTree::VascularTree(OxygenationMap * _oxMap, double* _perf, double _Pperf, double _Pterm, double _Qperf, double _rho, double _gamma, double _lambda, double _mu, double _minDistance, int _numNodes, double _voxelWidth, int _closestNeighbours, bool _tumour){
 	oxMap = _oxMap;
 	perf = new double[3]; perf[0] = _perf[0]; perf[1] = _perf[1];perf[2] = _perf[2];
 	Pperf = _Pperf;
@@ -77,6 +77,7 @@ VascularTree::VascularTree(OxygenationMap * _oxMap, double* _perf, double _Pperf
 	numNodes = _numNodes;
 	
 	closestNeighbours = _closestNeighbours;
+	tumour = _tumour;
 	
 	nt.addNode(NodeTable::ROOT, perf, -1, 1, 1, Qperf, -1, -1);
 }
@@ -180,10 +181,32 @@ double VascularTree::calculateFitness(){
     double acc = 0;
     
 	for(int i = 1; i < size; i++){
-		acc += pow(distance(i, nt.getParent(i)), mu) * pow(nt.getRadius(i), lambda);
+		double radius = nt.getRadius(i);
+		double length = distance(i, nt.getParent(i));
+
+		acc += pow(length, mu) * pow(radius, lambda);
 	}
 	
 	return acc;
+}
+
+/**
+ * Calculates the material cost.
+ */
+double VascularTree::calculateMC(){
+	
+    //stupid but you have to cast it otherwise it will throw a warning
+    int size = (int) nt.nodes.size();
+    double mc = 0;
+    
+	// https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9328247
+	for(int i = 1; i < size; i++){
+		double radius = nt.getRadius(i);
+		double length = distance(i, nt.getParent(i));
+		// Material Cost
+		mc += 2*PI*radius*length + PI*pow(radius, 2)*length;
+	}
+	return mc;
 }
 
 /**
@@ -304,7 +327,13 @@ double VascularTree::pointSegmentDistance(double* x0, int segment){
  * point and segment 'segment'
  */
 double* VascularTree::localOptimization(double * point, int segment, int steps){
-	double bestFitness = 1e200;
+	double bestFitness;
+	if (tumour) {
+		bestFitness = -1e200;
+	}
+	else {
+		bestFitness = 1e200;
+	}
 
 	double bif[3];
 	double perf[3];
@@ -332,8 +361,6 @@ double* VascularTree::localOptimization(double * point, int segment, int steps){
 	nt.startUndo();
 
 	connectPoint(point, segment, bif);
-	calculateRadius();
-	bestFitness = calculateFitness();
 	nt.applyUndo();
 		
 	double localBest[3];
@@ -355,11 +382,19 @@ double* VascularTree::localOptimization(double * point, int segment, int steps){
 		if(inVolume(test) &&oxMap->visible(perf, test) && oxMap->visible(con, test) && oxMap->visible(point, test) && validateCandidate(test, segment)){
 			connectPoint(point, segment, test);
 			calculateRadius();
-			double fitness = calculateFitness();
-			
-			if(fitness < bestFitness){
+			if (!tumour) {
+				double fitness = calculateFitness();
+				if(fitness < bestFitness){
 				localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
 				bestFitness = fitness;
+				}
+			}
+			else {
+				double fitness = calculateMC();
+				if(fitness > bestFitness) {
+					localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
+					bestFitness = fitness;
+				}
 			}
 		}
 		nt.applyUndo();
@@ -369,11 +404,19 @@ double* VascularTree::localOptimization(double * point, int segment, int steps){
 		if(inVolume(test) &&oxMap->visible(perf, test) && oxMap->visible(con, test) && oxMap->visible(point, test) && validateCandidate(test, segment)){
 			connectPoint(point, segment, test);
 			calculateRadius();
-			double fitness = calculateFitness();
-			
-			if(fitness < bestFitness){
+			if (!tumour) {
+				double fitness = calculateFitness();
+				if(fitness < bestFitness){
 				localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
 				bestFitness = fitness;
+				}
+			}
+			else {
+				double fitness = calculateMC();
+				if(fitness > bestFitness) {
+					localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
+					bestFitness = fitness;
+				}
 			}
 		}
 		nt.applyUndo();
@@ -383,11 +426,19 @@ double* VascularTree::localOptimization(double * point, int segment, int steps){
 		if(inVolume(test) &&oxMap->visible(perf, test) && oxMap->visible(con, test) && oxMap->visible(point, test) && validateCandidate(test, segment)){
 			connectPoint(point, segment, test);
 			calculateRadius();
-			double fitness = calculateFitness();
-			
-			if(fitness < bestFitness){
+			if (!tumour) {
+				double fitness = calculateFitness();
+				if(fitness < bestFitness){
 				localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
 				bestFitness = fitness;
+				}
+			}
+			else {
+				double fitness = calculateMC();
+				if(fitness > bestFitness) {
+					localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
+					bestFitness = fitness;
+				}
 			}
 		}
 		nt.applyUndo();
@@ -397,11 +448,19 @@ double* VascularTree::localOptimization(double * point, int segment, int steps){
 		if(inVolume(test) &&oxMap->visible(perf, test) && oxMap->visible(con, test) && oxMap->visible(point, test) && validateCandidate(test, segment)){
 			connectPoint(point, segment, test);
 			calculateRadius();
-			double fitness = calculateFitness();
-			
-			if(fitness < bestFitness){
+			if (!tumour) {
+				double fitness = calculateFitness();
+				if(fitness < bestFitness){
 				localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
 				bestFitness = fitness;
+				}
+			}
+			else {
+				double fitness = calculateMC();
+				if(fitness > bestFitness) {
+					localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
+					bestFitness = fitness;
+				}
 			}
 		}
 		nt.applyUndo();
@@ -411,11 +470,19 @@ double* VascularTree::localOptimization(double * point, int segment, int steps){
 		if(inVolume(test) &&oxMap->visible(perf, test) && oxMap->visible(con, test) && oxMap->visible(point, test) && validateCandidate(test, segment)){
 			connectPoint(point, segment, test);
 			calculateRadius();
-			double fitness = calculateFitness();
-			
-			if(fitness < bestFitness){
+			if (!tumour) {
+				double fitness = calculateFitness();
+				if(fitness < bestFitness){
 				localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
 				bestFitness = fitness;
+				}
+			}
+			else {
+				double fitness = calculateMC();
+				if(fitness > bestFitness) {
+					localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
+					bestFitness = fitness;
+				}
 			}
 		}
 		nt.applyUndo();
@@ -425,11 +492,19 @@ double* VascularTree::localOptimization(double * point, int segment, int steps){
 		if(inVolume(test) &&oxMap->visible(perf, test) && oxMap->visible(con, test) && oxMap->visible(point, test) && validateCandidate(test, segment)){
 			connectPoint(point, segment, test);
 			calculateRadius();
-			double fitness = calculateFitness();
-			
-			if(fitness < bestFitness){
+			if (!tumour) {
+				double fitness = calculateFitness();
+				if(fitness < bestFitness){
 				localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
 				bestFitness = fitness;
+				}
+			}
+			else {
+				double fitness = calculateMC();
+				if(fitness > bestFitness) {
+					localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
+					bestFitness = fitness;
+				}
 			}
 		}
 		nt.applyUndo();
@@ -526,23 +601,38 @@ bool VascularTree::connectCandidate(double* point, int steps){
 			return false;
 		candidateSegments[j] = closest;
 	}
+
+	//DECIDE IF BIRUFACTION, TRIFURCATION, OR NO BRANCH
+	int prob = rand()%100;
+	int pathDecision;
+	if (prob <= 5) 
+		pathDecision = 1;
+	else if (prob <= 15)
+		pathDecision = 2;
+	else
+		pathDecision = 3;
 	
 	//try the first 'closestNeighbours' segments
 	int count = 0;
 	double* test;
-	for(j = 0; j < numCandidates && count < closestNeighbours; j++){
-		test = localOptimization(point, candidateSegments[j], steps);
-		if(test != NULL){
-			count++;
-			if(test[3] < bestFitness){
-				best[0] = test[0]; best[1] = test[1]; best[2] = test[2];
-				bestSegment = candidateSegments[j];
-				bestFitness = test[3];
-				foundSolution = true;
+	if(pathDecision == 3)
+		for(j = 0; j < numCandidates && count < closestNeighbours; j++){
+			test = localOptimization(point, candidateSegments[j], steps);
+			if(test != NULL){
+				count++;
+				if(test[3] < bestFitness){
+					best[0] = test[0]; best[1] = test[1]; best[2] = test[2];
+					bestSegment = candidateSegments[j];
+					bestFitness = test[3];
+					foundSolution = true;
+				}
 			}
+			delete test;
 		}
-		delete test;
-	}
+	else if (pathDecision == 2)
+		cout<<"Would create a trifurcation here..."<<endl;
+	else
+		cout<<"Would not branch out here..."<<endl;
 	
 	delete candidateSegments;
 

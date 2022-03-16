@@ -82,10 +82,11 @@ public:
 	double * perf = new double[3];
 	
 	int closestNeighbours;
+	bool tumour;
 	
 	double mapVoxelWidth; //in cm
 	
-	VascularTree(OxygenationMap * oxMap, double* perf, double Pperf, double Pterm, double Qperf, double rho, double gamma, double lambda, double mu, double minDistance, int numNodes, double voxelWidth, int closestNeighbours);
+	VascularTree(OxygenationMap * oxMap, double* perf, double Pperf, double Pterm, double Qperf, double rho, double gamma, double lambda, double mu, double minDistance, int numNodes, double voxelWidth, int closestNeighbours, bool tumour);
 		
 	//calculate the distance between to nodes in the node table
 	double distance(int from, int to);
@@ -103,6 +104,9 @@ public:
 	//calculate the fitness function
 	double calculateFitness();
 
+	//calculate the material cost
+	double calculateMC();
+	
 	//When used by local optimization, ignored is the segment to connect to
 	//otherwise it should be -1;
 	bool validateCandidate(double* x0, int ignored);
