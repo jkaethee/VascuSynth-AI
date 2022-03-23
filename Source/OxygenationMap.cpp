@@ -254,7 +254,6 @@ void OxygenationMap::loadMap(string filename){
 			}
 			dim[i] = atoi(temp);
 		}
-		
 		map_d = new double[dim[0]*dim[1]*dim[2]];
 		effectiveMap_d = new double[dim[0]*dim[1]*dim[2]];
 
@@ -291,7 +290,19 @@ void OxygenationMap::loadMap(string filename){
 			strcpy(tok, line.c_str());
 
 			double value = atof(line.c_str());
-			
+
+			// Store regions of zero demand in zero_demand_vector
+			// Coordinates will be seperated by one space as per convention in the
+			// oxygenation map file
+			if (value == 0) {
+				string zero_region;
+				for (i = 0; i < 6; i++) {
+					zero_region += to_string(region[i]);
+					zero_region += " ";
+				}
+				zero_demand_vector.push_back(zero_region);
+			}
+
 			for(i = region[0]; i < region[3]; i++) {
 				for(j = region[1]; j< region[4]; j++) {
 					for(k = region[2]; k < region[5]; k++){
@@ -300,7 +311,6 @@ void OxygenationMap::loadMap(string filename){
 					}
 				}
 			}
-			
 		}
 		
 		mapFile.close();

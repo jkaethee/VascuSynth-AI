@@ -68,6 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <iterator>
 #include <cmath>
+#include <Python.h>
 
 using namespace std;
 
@@ -192,6 +193,8 @@ VascularTree * buildTree(const char * filename){
 	int closestNeighbours;
 	int randomSeed = -1;
 	bool tumour;
+	bool debug;
+	bool partialTumour;
 	string line;
     string supplyMapFileName;
     string oxygenMapFileName;
@@ -214,6 +217,8 @@ VascularTree * buildTree(const char * filename){
     bool supplyMapFileNameSet = false;
     bool oxygenMapFileNameSet = false;
 	bool tumourSet = false;
+	bool debugSet = false;
+	bool partialTumourSet = false;
 	
 	vector<string> *mapFilesLines = readFileLines(filename);
     int size = (int) mapFilesLines->size();
@@ -323,13 +328,20 @@ VascularTree * buildTree(const char * filename){
 		} else if (name.compare("TUMOUR") == 0) {
 			tumour = atoi(value.c_str());
 			tumourSet = true;
+		} else if (name.compare("PARTIAL_TUMOUR") == 0) {
+			partialTumour = atoi(value.c_str());
+			partialTumourSet = true;
+		} else if (name.compare("DEBUG") == 0) {
+			debug = atoi(value.c_str());
+			debugSet = true;
 		}
 		
 		
 	}
         
     //make sure that we have everything defined
-    if (perfSet && pperfSet && ptermSet && qperfSet && rhoSet && gammaSet && lambdaSet && muSet && minDistanceSet && numNodesSet && voxelWidthSet && closestNeighboursSet && supplyMapFileNameSet && oxygenMapFileNameSet && tumourSet) {
+    if (perfSet && pperfSet && ptermSet && qperfSet && rhoSet && gammaSet && lambdaSet && muSet && minDistanceSet && numNodesSet && voxelWidthSet 
+	&& closestNeighboursSet && supplyMapFileNameSet && oxygenMapFileNameSet && tumourSet && partialTumourSet && debugSet) {
     
         //load the supply map
         sm = new SupplyMap();
@@ -353,7 +365,7 @@ VascularTree * buildTree(const char * filename){
 
         //TODO: should probably check and make sure everything is defined
         //and throw an error if it is not (and catch the error in the main function)
-        VascularTree *vt = new VascularTree(om, perf, pperf, pterm, qperf, rho, gamma, lambda, mu, minDistance, numNodes, voxelWidth, closestNeighbours, tumour);
+        VascularTree *vt = new VascularTree(om, perf, pperf, pterm, qperf, rho, gamma, lambda, mu, minDistance, numNodes, voxelWidth, closestNeighbours, tumour, partialTumour, debug);
         vt->buildTree();
         
         return vt;
@@ -742,13 +754,41 @@ int main(int argc, char** argv){
             delete buff;
             delete td;
             delete vt;
+			int argc = 2;
+			wchar_t * argv[2];
+			const char * orig = rootDirectory.c_str();
+
+			// Convert to a wchar_t*
+			size_t origsize = strlen(orig) + 1;
+			const size_t newsize = 100;
+			size_t convertedChars = 0;
+			wchar_t wcstring[newsize];
+			mbstowcs(wcstring, orig, newsize);
+			wcscat(wcstring, L" (wchar_t *)");
+			
+			argv[0] = wcstring;
+			wchar_t * wcdebug;
+			if (vt->debug)
+				wcdebug = L"True";
+			else
+				wcdebug = L"False";
+			argv[1] = wcdebug;
+
+			Py_Initialize();
+			PySys_SetArgv(argc,argv);
+			FILE *file = fopen("generate_mip.py", "r");
+			if (file == NULL) {
+				perror("fopen");
+			}
+			PyRun_SimpleFile(file, "generate_mip.py");
+			Py_Finalize();
         }
         
     } catch (string str) {
         cout << "ERROR: " << str << endl;
         cout << "Exiting VascuSynth" << endl;
     }
-
+	
 	return 0;
 }
 

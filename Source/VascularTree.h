@@ -83,10 +83,12 @@ public:
 	
 	int closestNeighbours;
 	bool tumour;
+	bool partialTumour;
+	bool debug;
 	
 	double mapVoxelWidth; //in cm
 	
-	VascularTree(OxygenationMap * oxMap, double* perf, double Pperf, double Pterm, double Qperf, double rho, double gamma, double lambda, double mu, double minDistance, int numNodes, double voxelWidth, int closestNeighbours, bool tumour);
+	VascularTree(OxygenationMap * oxMap, double* perf, double Pperf, double Pterm, double Qperf, double rho, double gamma, double lambda, double mu, double minDistance, int numNodes, double voxelWidth, int closestNeighbours, bool tumour, bool partialTumour, bool debug);
 		
 	//calculate the distance between to nodes in the node table
 	double distance(int from, int to);

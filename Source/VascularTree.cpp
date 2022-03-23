@@ -49,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cmath>
 #include <iostream>
+#include <string>
+#include <sstream>
 
 #include "VascularTree.h"
 #include "OxygenationMap.h"
@@ -61,7 +63,7 @@ using namespace std;
 /**  
  * 	Constructor
  */				
-VascularTree::VascularTree(OxygenationMap * _oxMap, double* _perf, double _Pperf, double _Pterm, double _Qperf, double _rho, double _gamma, double _lambda, double _mu, double _minDistance, int _numNodes, double _voxelWidth, int _closestNeighbours, bool _tumour){
+VascularTree::VascularTree(OxygenationMap * _oxMap, double* _perf, double _Pperf, double _Pterm, double _Qperf, double _rho, double _gamma, double _lambda, double _mu, double _minDistance, int _numNodes, double _voxelWidth, int _closestNeighbours, bool _tumour, bool _partialTumour, bool _debug){
 	oxMap = _oxMap;
 	perf = new double[3]; perf[0] = _perf[0]; perf[1] = _perf[1];perf[2] = _perf[2];
 	Pperf = _Pperf;
@@ -78,7 +80,9 @@ VascularTree::VascularTree(OxygenationMap * _oxMap, double* _perf, double _Pperf
 	
 	closestNeighbours = _closestNeighbours;
 	tumour = _tumour;
-	
+	partialTumour = _partialTumour;
+	debug = _debug;
+
 	nt.addNode(NodeTable::ROOT, perf, -1, 1, 1, Qperf, -1, -1);
 }
 
@@ -191,7 +195,7 @@ double VascularTree::calculateFitness(){
 }
 
 /**
- * Calculates the material cost.
+ * Calculates the material cost used for tumour vascular tree generation.
  */
 double VascularTree::calculateMC(){
 	
@@ -549,6 +553,7 @@ bool VascularTree::connectCandidate(double* point, int steps){
 	//cout << "connect candidate" << endl;
 	
 	if(!validateCandidate(point, -1)) {
+		cout<<"Candiate is too close to an existing segment"<<endl;
 		return false;	//candiate is too close to an existing segment
 	}
 	
@@ -663,6 +668,43 @@ void VascularTree::buildTree(){
 		double sum = oxMap->sum();
 		oxMap->candidate(sum, term);
 		cand[0] = term[0]; cand[1] = term[1]; cand[2] = term[2];
+
+		// If generating tumour vasculature within healthy tree, manipulate parameters and switch objective function
+		if (partialTumour) {
+			for(string region: oxMap->zero_demand_vector) {
+				// Get strings from zero_demand_vector and convert them into integers
+				stringstream stream(region);
+				vector<int> coordinates;
+				int temp;
+				while (stream >> temp) {
+					coordinates.push_back(temp);
+				}
+
+				// Check if candidate node falls near immediate border of the necrotic region
+				// LOGIC: If node falls between necrotic regions x and y borders or within 5 units outside of them,
+				//			increase blood viscosity (thicker vessels) and decrease minDistance (more dense)
+				if (( ((abs(cand[0] - coordinates[0]) <= 5) || (abs(cand[0] - coordinates[3]) <= 5)
+				|| (cand[0] >= coordinates[0] && cand[0] <= coordinates[3]))
+				&& ((abs(cand[1] - coordinates[1]) <= 5) || (abs(cand[1] - coordinates[4]) <= 5)
+				|| (cand[1] >= coordinates[1] && cand[1] <= coordinates[4])) )) {
+					
+					tumour = true;
+					closestNeighbours = 2;
+					rho = 0.036;
+					minDistance = 1;
+				}
+
+				// If the candidate node does not fall under the above conditions, it is part of the healthy tree,
+				// so reset the parameters to their original values (need a solution that isn't hardcoded as it is below)
+				// Perhaps define a set of variables to hold the original values?
+				else {
+					tumour = false;
+					closestNeighbours = 5;
+					rho = 0.0036;
+					minDistance = 5;
+				}
+			}
+		}
 		if(connectCandidate(cand, 20)){
 			count++;
 			oxMap->applyCandidate(term);

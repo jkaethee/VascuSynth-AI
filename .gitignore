@@ -2,5 +2,6 @@ CMakeFiles/
 ITKFactoryRegistration/
 normal/
 tumour/
+normal+tumour/
 example/
 Build/
