@@ -683,11 +683,11 @@ void VascularTree::buildTree(){
 				// Check if candidate node falls near immediate border of the necrotic region
 				// LOGIC: If node falls between necrotic regions x and y borders or within 5 units outside of them,
 				//			increase blood viscosity (thicker vessels) and decrease minDistance (more dense)
-				if (( ((abs(cand[0] - coordinates[0]) <= 5) || (abs(cand[0] - coordinates[3]) <= 5)
+				int buffer = 3;
+				if (( ((abs(cand[0] - coordinates[0]) <= buffer) || (abs(cand[0] - coordinates[3]) <= buffer)
 				|| (cand[0] >= coordinates[0] && cand[0] <= coordinates[3]))
-				&& ((abs(cand[1] - coordinates[1]) <= 5) || (abs(cand[1] - coordinates[4]) <= 5)
+				&& ((abs(cand[1] - coordinates[1]) <= buffer) || (abs(cand[1] - coordinates[4]) <= buffer)
 				|| (cand[1] >= coordinates[1] && cand[1] <= coordinates[4])) )) {
-					
 					tumour = true;
 					closestNeighbours = 2;
 					rho = 0.036;
@@ -705,7 +705,7 @@ void VascularTree::buildTree(){
 				}
 			}
 		}
-		if(connectCandidate(cand, 20)){
+		if(connectCandidate(cand, 50)){
 			count++;
 			oxMap->applyCandidate(term);
 		}

@@ -776,7 +776,7 @@ int main(int argc, char** argv){
 
 			Py_Initialize();
 			PySys_SetArgv(argc,argv);
-			FILE *file = fopen("generate_mip.py", "r");
+			FILE *file = fopen("../Source/generate_mip.py", "r");
 			if (file == NULL) {
 				perror("fopen");
 			}
