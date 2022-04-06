@@ -68,6 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <iterator>
 #include <cmath>
+#include <chrono>
 #include <Python.h>
 
 using namespace std;
@@ -666,7 +667,8 @@ int main(int argc, char** argv){
 	}
 	
     try {
-    
+		chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+
         //read the param files and image name files
         vector<string> *paramFiles = readFileLines(argv[1]);
         vector<string> *imageNameFiles = readFileLines(argv[2]);
@@ -783,7 +785,8 @@ int main(int argc, char** argv){
 			PyRun_SimpleFile(file, "generate_mip.py");
 			Py_Finalize();
         }
-        
+		chrono::steady_clock::time_point end = chrono::steady_clock::now();
+        cout << "Time difference = " << chrono::duration_cast<chrono::seconds> (end - begin).count() << "[seconds]" << endl;
     } catch (string str) {
         cout << "ERROR: " << str << endl;
         cout << "Exiting VascuSynth" << endl;
