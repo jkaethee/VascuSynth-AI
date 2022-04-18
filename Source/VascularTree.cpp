@@ -671,7 +671,7 @@ void VascularTree::buildTree(){
 
 		// If generating tumour vasculature within healthy tree, manipulate parameters and switch objective function
 		if (partialTumour) {
-			for(string region: oxMap->zero_demand_vector) {
+			for(string region: oxMap->hypoxic_region_vector) {
 				// Get strings from zero_demand_vector and convert them into integers
 				stringstream stream(region);
 				vector<int> coordinates;

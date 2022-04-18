@@ -644,7 +644,6 @@ void printTreeStructure(VascularTree * vt, const char * filePath){
 	
 }
 
-
 /**
  * VascuSynth: takes a series of parameter files, image names and (optionally) noise files
  * and generates a vascular structure based on the parameters.  The 3d volume is saved
@@ -756,10 +755,12 @@ int main(int argc, char** argv){
             delete buff;
             delete td;
             delete vt;
-			int argc = 2;
-			wchar_t * argv[2];
-			const char * orig = rootDirectory.c_str();
 
+			int argc = 4;
+			wchar_t * argv[4];
+
+			// Send root directory path to the Python script
+			const char * orig = rootDirectory.c_str();
 			// Convert to a wchar_t*
 			size_t origsize = strlen(orig) + 1;
 			const size_t newsize = 100;
@@ -767,14 +768,43 @@ int main(int argc, char** argv){
 			wchar_t wcstring[newsize];
 			mbstowcs(wcstring, orig, newsize);
 			wcscat(wcstring, L" (wchar_t *)");
-			
 			argv[0] = wcstring;
+			
+			// Send DEBUG flag value to the Python script
 			wchar_t * wcdebug;
 			if (vt->debug)
 				wcdebug = L"True";
 			else
 				wcdebug = L"False";
 			argv[1] = wcdebug;
+
+			// Send the oxMap coordinates for hypoxic regions to the Python script
+			string totalRegionString;
+			for(string region:vt->oxMap->hypoxic_region_vector) {
+				totalRegionString += region;
+			}
+			const char * reg = totalRegionString.c_str();
+			// Convert to a wchar_t*
+			size_t origsizeTwo = strlen(reg) + 1;
+			const size_t newsizeTwo = 100;
+			wchar_t wcstringTwo[newsize];
+			mbstowcs(wcstringTwo, reg, newsizeTwo);
+			wcscat(wcstringTwo, L" (wchar_t *)");
+			argv[2] = wcstringTwo;
+
+			// Send the oxMap values for hypoxic regions to the Python script
+			string totalValueString;
+			for(string value:vt->oxMap->hypoxic_value_vector) {
+				totalValueString += value;
+			}
+			const char * val = totalValueString.c_str();
+			// Convert to a wchar_t*
+			size_t origsizeThree = strlen(val) + 1;
+			const size_t newsizeThree = 100;
+			wchar_t wcstringThree[newsizeThree];
+			mbstowcs(wcstringThree, val, newsizeThree);
+			wcscat(wcstringThree, L" (wchar_t *)");
+			argv[3] = wcstringThree;
 
 			Py_Initialize();
 			PySys_SetArgv(argc,argv);

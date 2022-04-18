@@ -294,13 +294,15 @@ void OxygenationMap::loadMap(string filename){
 			// Store regions of zero demand in zero_demand_vector
 			// Coordinates will be seperated by one space as per convention in the
 			// oxygenation map file
-			if (value == 0) {
-				string zero_region;
+			if (value != 1) {
+				string hypoxic_region;
 				for (i = 0; i < 6; i++) {
-					zero_region += to_string(region[i]);
-					zero_region += " ";
+					hypoxic_region += to_string(region[i]);
+					hypoxic_region += " ";
 				}
-				zero_demand_vector.push_back(zero_region);
+				hypoxic_region_vector.push_back(hypoxic_region);
+				string oxDemand = to_string(value) + " ";
+				hypoxic_value_vector.push_back(oxDemand);
 			}
 
 			for(i = region[0]; i < region[3]; i++) {

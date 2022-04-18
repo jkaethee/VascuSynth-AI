@@ -73,7 +73,9 @@ public:
 	MTRand rand;
 
 	int dim[3];
-	vector<string> zero_demand_vector;
+	// Stores the coordinates and values for hypoxic regions
+	vector<string> hypoxic_region_vector;
+	vector<string> hypoxic_value_vector;
 
 	OxygenationMap(SupplyMap *sMap, int randSeed);
 
