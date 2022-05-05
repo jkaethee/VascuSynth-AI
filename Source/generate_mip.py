@@ -76,7 +76,7 @@ min = np.min(oxygen_demand_cube, axis=2)
 # This is just to match the orientation in 3D slicer when loading the image slices
 min = np.rot90(min,1)
 plt.imsave('oxMap.png', min, cmap='gray', vmin=0, vmax=1)
-
+print('All done MIP Script!')
 # print('Generating 3D Oxygen Demand Cube...')
 # first = datetime.now()
 # data = oxygen_demand_cube

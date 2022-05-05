@@ -762,9 +762,7 @@ int main(int argc, char** argv){
 			// Send root directory path to the Python script
 			const char * orig = rootDirectory.c_str();
 			// Convert to a wchar_t*
-			size_t origsize = strlen(orig) + 1;
 			const size_t newsize = 100;
-			size_t convertedChars = 0;
 			wchar_t wcstring[newsize];
 			mbstowcs(wcstring, orig, newsize);
 			wcscat(wcstring, L" (wchar_t *)");
@@ -783,13 +781,11 @@ int main(int argc, char** argv){
 			for(string region:vt->oxMap->hypoxic_region_vector) {
 				totalRegionString += region;
 			}
-			const char * reg = totalRegionString.c_str();
+
 			// Convert to a wchar_t*
-			size_t origsizeTwo = strlen(reg) + 1;
-			const size_t newsizeTwo = 100;
-			wchar_t wcstringTwo[newsize];
-			mbstowcs(wcstringTwo, reg, newsizeTwo);
-			wcscat(wcstringTwo, L" (wchar_t *)");
+			wstring widestrRegions = wstring(totalRegionString.begin(), totalRegionString.end());
+			const wchar_t* widestrRegionsPointer = widestrRegions.c_str();
+			wchar_t* wcstringTwo = const_cast <wchar_t*>(widestrRegionsPointer);
 			argv[2] = wcstringTwo;
 
 			// Send the oxMap values for hypoxic regions to the Python script
@@ -797,13 +793,11 @@ int main(int argc, char** argv){
 			for(string value:vt->oxMap->hypoxic_value_vector) {
 				totalValueString += value;
 			}
-			const char * val = totalValueString.c_str();
+			cout<<totalValueString<<endl;
 			// Convert to a wchar_t*
-			size_t origsizeThree = strlen(val) + 1;
-			const size_t newsizeThree = 100;
-			wchar_t wcstringThree[newsizeThree];
-			mbstowcs(wcstringThree, val, newsizeThree);
-			wcscat(wcstringThree, L" (wchar_t *)");
+			wstring widestrValues = wstring(totalValueString.begin(), totalValueString.end());
+			const wchar_t* widestrValuesPointer = widestrValues.c_str();
+			wchar_t* wcstringThree = const_cast <wchar_t*>(widestrValuesPointer);
 			argv[3] = wcstringThree;
 
 			Py_Initialize();
@@ -814,9 +808,10 @@ int main(int argc, char** argv){
 			}
 			PyRun_SimpleFile(file, "generate_mip.py");
 			Py_Finalize();
+
         }
 		chrono::steady_clock::time_point end = chrono::steady_clock::now();
-        cout << "Time difference = " << chrono::duration_cast<chrono::seconds> (end - begin).count() << "[seconds]" << endl;
+        cout << "Elapsed Time = " << chrono::duration_cast<chrono::seconds> (end - begin).count() << "[seconds]" << endl;
     } catch (string str) {
         cout << "ERROR: " << str << endl;
         cout << "Exiting VascuSynth" << endl;
