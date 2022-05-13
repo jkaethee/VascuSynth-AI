@@ -689,7 +689,6 @@ void VascularTree::buildTree(){
 				&& ((abs(cand[1] - coordinates[1]) <= buffer) || (abs(cand[1] - coordinates[4]) <= buffer)
 				|| (cand[1] >= coordinates[1] && cand[1] <= coordinates[4])) )) {
 					tumour = true;
-					closestNeighbours = 2;
 					rho = 0.036;
 					minDistance = 1;
 				}
@@ -699,7 +698,6 @@ void VascularTree::buildTree(){
 				// Perhaps define a set of variables to hold the original values?
 				else {
 					tumour = false;
-					closestNeighbours = 5;
 					rho = 0.0036;
 					minDistance = 5;
 				}

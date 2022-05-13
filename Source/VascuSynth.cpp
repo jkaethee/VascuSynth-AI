@@ -99,7 +99,7 @@ vector<string> * readFileLines(const char * filename){
 		oFile.close();
 		
 	} else {
-		throw "Could not open file " + ( (string) filename);
+		throw "Could not open file " + ( (string) filename)+"s";
 	}
 	
 	return lines;
@@ -677,11 +677,14 @@ int main(int argc, char** argv){
         string *noiseFiles = new string[argc-4];
         
         int paramFilesSize = (int) paramFiles->size();
+		Py_Initialize();
         
         //go through each param file and build tree an spit it out
         for(int m = 0; m < paramFilesSize; m++){
             
             string paramFile = paramFiles->at(m);
+			// Do not proceed with attempting to build the tree if there is a blank line being read from the paramFile
+			if (paramFile.empty()) continue;
             string rootDirectory = imageNameFiles->at(m);
 
             for(int i = 4; i < argc; i++) {
@@ -690,12 +693,12 @@ int main(int argc, char** argv){
             
             int numNoise = argc-4;
             
-            cout << "Reading parameters and building the tree..." << endl;
+            cout << "Reading parameters and building Tree #"<<m<<"..." << endl;
             
             //build the tree
             VascularTree * vt = buildTree(paramFile.c_str());
             
-            cout << "The vascular tree has been built sucessfully..." << endl;
+            cout << "Vascular Tree #"<<m<<" has been built sucessfully..." << endl;
             
             //filter out the /r that appears at times and messes up the directory name
             if (rootDirectory[ rootDirectory.length() - 1 ] == '\r') {
@@ -756,8 +759,8 @@ int main(int argc, char** argv){
             delete td;
             delete vt;
 
-			int argc = 4;
-			wchar_t * argv[4];
+			int argc = 5;
+			wchar_t * argv[5];
 
 			// Send root directory path to the Python script
 			const char * orig = rootDirectory.c_str();
@@ -793,23 +796,27 @@ int main(int argc, char** argv){
 			for(string value:vt->oxMap->hypoxic_value_vector) {
 				totalValueString += value;
 			}
-			cout<<totalValueString<<endl;
+
 			// Convert to a wchar_t*
 			wstring widestrValues = wstring(totalValueString.begin(), totalValueString.end());
 			const wchar_t* widestrValuesPointer = widestrValues.c_str();
 			wchar_t* wcstringThree = const_cast <wchar_t*>(widestrValuesPointer);
 			argv[3] = wcstringThree;
 
-			Py_Initialize();
+			wstring widestrTreeNum = to_wstring(m);
+			const wchar_t* widestrTreeNumPointer = widestrTreeNum.c_str();
+			wchar_t* wcstringFour = const_cast <wchar_t*>(widestrTreeNumPointer);
+			argv[4] = wcstringFour;
+
 			PySys_SetArgv(argc,argv);
 			FILE *file = fopen("../Source/generate_mip.py", "r");
 			if (file == NULL) {
 				perror("fopen");
 			}
 			PyRun_SimpleFile(file, "generate_mip.py");
-			Py_Finalize();
 
         }
+		Py_Finalize();
 		chrono::steady_clock::time_point end = chrono::steady_clock::now();
         cout << "Elapsed Time = " << chrono::duration_cast<chrono::seconds> (end - begin).count() << "[seconds]" << endl;
     } catch (string str) {

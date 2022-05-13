@@ -1,5 +1,5 @@
 import os
-import random
+from numpy import random
 
 def generate_parameter_file(p_num=1,
                             supply_map = "sMap.txt",
@@ -67,9 +67,9 @@ def generate_parameter_file(p_num=1,
 
     with open(file_name, "w") as file:
         # Write name of supply map file
-        file.write("SUPPLY_MAP: " + str(supply_map) + "\n")
+        file.write("SUPPLY_MAP: " + supply_map + "\n")
         # Write name of the oxygenation map file
-        file.write("OXYGENATION_MAP: " + str(oxygen_map) + "\n")
+        file.write("OXYGENATION_MAP: " + oxygen_map + "\n")
         # Write the random seed value (Default is 0 which generates unique trees)
         file.write("RANDOM_SEED: " + str(random_seed) + "\n")
         # Write the perforation point (Default is 0 50 50)
@@ -176,18 +176,19 @@ def generate_and_write_oxygen_demand_gradient(file):
         demand -= demand_increment
         demand = round(demand, 1)
         if demand==0:
+            # This value is close to zero but not exactly zero to avoid completely void region in center
             file.write(str(0.05) + "\n")
+            break
         else:
             file.write(str(demand) + "\n")
-
-        # Make a smaller box within the previous box
-        b_right_corner_x += box_increment; b_right_corner_y += box_increment; b_right_corner_z += box_increment
-        t_left_corner_x -= box_increment; t_left_corner_y -= box_increment; t_left_corner_z -= box_increment 
+             # Make a smaller box within the previous box
+            b_right_corner_x += box_increment; b_right_corner_y += box_increment; b_right_corner_z += box_increment
+            t_left_corner_x -= box_increment; t_left_corner_y -= box_increment; t_left_corner_z -= box_increment 
 
 def main():
     os.chdir('/home/jathushan/Desktop/VascuSynth/HT_Trees')
     # Define number of trees to generate config files for
-    num_of_trees = 1
+    num_of_trees = 4
     # Define parameters for generating normal vascular tres. These values are found in Table 1 of:
     # M. Kociński, A. Klepaczko, A. Materka, M. Chekenya, and A. Lundervold, 
     #   “3D image texture analysis of simulated and real-world vascular trees,” 
@@ -197,7 +198,7 @@ def main():
     rho = 0.0036
     # The parameters below were determined through experimentation for generating suitable normal vascular trees
     min_distance = 5
-    num_nodes = 500
+    num_nodes = 650
     
     # Create paramFiles.txt to hold all the parameter text files
     paramFiles = open(os.getcwd()+"/paramFiles.txt", "w")
@@ -219,6 +220,7 @@ def main():
         perf_point = pick_perforation_point()
 
         generate_parameter_file(p_num = tree_num,
+                                oxygen_map="oxMap_"+str(tree_num)+".txt",
                                 perf_point=perf_point,
                                 perf_pressure=perf_pressure,
                                 term_pressure=term_pressure,

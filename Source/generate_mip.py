@@ -28,6 +28,7 @@ data_path = sys.argv[0]
 DEBUG = sys.argv[1]
 demand_vectors = sys.argv[2]
 demand_values = sys.argv[3]
+tree_number = sys.argv[4]
 
 print('Generating MIP Image...')
 dir = data_path.split()[0] + '/original_image/*.jpg'
@@ -37,10 +38,10 @@ im_3d = im_collection.concatenate()
 im_max = np.max(im_3d, axis=0)
 # This is just to match the orientation in 3D slicer when loading the image slices
 im_max = np.flip(im_max, 0)
-plt.imsave('mip0.png', im_max, cmap='gray')
+plt.imsave('mip_' + str(tree_number) + '.png', im_max, cmap='gray')
 
 noisy_im = add_noise(im_max, 'speckle')
-plt.imsave('mip_noisy.png', noisy_im, cmap='gray')
+plt.imsave('mip_noisy_' + str(tree_number) + '.png', noisy_im, cmap='gray')
 
 print('Generating Oxygen Demand Ground Truth..')
 # Convert the string to a list of integers for the oxygen demand coordinates
@@ -75,7 +76,7 @@ for idx, value in enumerate(values):
 min = np.min(oxygen_demand_cube, axis=2)
 # This is just to match the orientation in 3D slicer when loading the image slices
 min = np.rot90(min,1)
-plt.imsave('oxMap.png', min, cmap='gray', vmin=0, vmax=1)
+plt.imsave('oxMap_' + str(tree_number) + '.png', min, cmap='gray', vmin=0, vmax=1)
 print('All done MIP Script!')
 # print('Generating 3D Oxygen Demand Cube...')
 # first = datetime.now()
