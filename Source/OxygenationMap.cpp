@@ -303,6 +303,7 @@ void OxygenationMap::loadMap(string filename){
 				hypoxic_region_vector.push_back(hypoxic_region);
 				string oxDemand = to_string(value) + " ";
 				hypoxic_value_vector.push_back(oxDemand);
+				hypoxic_map.insert({hypoxic_region, value});
 			}
 
 			for(i = region[0]; i < region[3]; i++) {

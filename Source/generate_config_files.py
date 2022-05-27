@@ -177,7 +177,7 @@ def generate_and_write_oxygen_demand_gradient(file):
         demand = round(demand, 1)
         if demand==0:
             # This value is close to zero but not exactly zero to avoid completely void region in center
-            file.write(str(0.05) + "\n")
+            file.write(str(0.0) + "\n")
             break
         else:
             file.write(str(demand) + "\n")
@@ -188,7 +188,7 @@ def generate_and_write_oxygen_demand_gradient(file):
 def main():
     os.chdir('/home/jathushan/Desktop/VascuSynth/HT_Trees')
     # Define number of trees to generate config files for
-    num_of_trees = 4
+    num_of_trees = 3
     # Define parameters for generating normal vascular tres. These values are found in Table 1 of:
     # M. Kociński, A. Klepaczko, A. Materka, M. Chekenya, and A. Lundervold, 
     #   “3D image texture analysis of simulated and real-world vascular trees,” 
@@ -197,8 +197,8 @@ def main():
     term_pressure = 60000
     rho = 0.0036
     # The parameters below were determined through experimentation for generating suitable normal vascular trees
-    min_distance = 5
-    num_nodes = 650
+    min_distance = 4
+    num_nodes = 800
     
     # Create paramFiles.txt to hold all the parameter text files
     paramFiles = open(os.getcwd()+"/paramFiles.txt", "w")

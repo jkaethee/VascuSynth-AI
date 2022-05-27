@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "SupplyMap.h"
 #include "MersenneTwister.h"
@@ -76,6 +77,7 @@ public:
 	// Stores the coordinates and values for hypoxic regions
 	vector<string> hypoxic_region_vector;
 	vector<string> hypoxic_value_vector;
+	map<string, double> hypoxic_map;
 
 	OxygenationMap(SupplyMap *sMap, int randSeed);
 

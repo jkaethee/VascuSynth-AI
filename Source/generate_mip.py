@@ -36,7 +36,7 @@ im_collection = io.imread_collection(dir)
 im_3d = im_collection.concatenate()
 
 im_max = np.max(im_3d, axis=0)
-# This is just to match the orientation in 3D slicer when loading the image slices
+# This is just to match the orientation in 3D Slicer when loading the image slices
 im_max = np.flip(im_max, 0)
 plt.imsave('mip_' + str(tree_number) + '.png', im_max, cmap='gray')
 

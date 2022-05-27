@@ -195,13 +195,15 @@ double VascularTree::calculateFitness(){
 }
 
 /**
- * Calculates the material cost used for tumour vascular tree generation.
+ * Calculates the material cost and power cost used for tumour vascular tree generation.
+ * When generating tumourous vasculature, bifurcation points will be chosen based
+ * on which point maximizes the the value returned from this function
  */
-double VascularTree::calculateMC(){
-	
+double VascularTree::calculateTumourousFitness(){
     //stupid but you have to cast it otherwise it will throw a warning
     int size = (int) nt.nodes.size();
     double mc = 0;
+	double pc = 0;
     
 	// https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9328247
 	for(int i = 1; i < size; i++){
@@ -209,8 +211,11 @@ double VascularTree::calculateMC(){
 		double length = distance(i, nt.getParent(i));
 		// Material Cost
 		mc += 2*PI*radius*length + PI*pow(radius, 2)*length;
+		// Power Cost
+		pc += pow(nt.getFlow(i), 2) * ((8*rho*length) / (PI * pow(radius, 4)));
 	}
-	return mc;
+
+	return mc*pc;
 }
 
 /**
@@ -331,13 +336,7 @@ double VascularTree::pointSegmentDistance(double* x0, int segment){
  * point and segment 'segment'
  */
 double* VascularTree::localOptimization(double * point, int segment, int steps){
-	double bestFitness;
-	if (tumour) {
-		bestFitness = -1e200;
-	}
-	else {
-		bestFitness = 1e200;
-	}
+	double bestFitness = tumour ? -1e200 : 1e200;
 
 	double bif[3];
 	double perf[3];
@@ -394,7 +393,7 @@ double* VascularTree::localOptimization(double * point, int segment, int steps){
 				}
 			}
 			else {
-				double fitness = calculateMC();
+				double fitness = calculateTumourousFitness();
 				if(fitness > bestFitness) {
 					localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
 					bestFitness = fitness;
@@ -416,7 +415,7 @@ double* VascularTree::localOptimization(double * point, int segment, int steps){
 				}
 			}
 			else {
-				double fitness = calculateMC();
+				double fitness = calculateTumourousFitness();
 				if(fitness > bestFitness) {
 					localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
 					bestFitness = fitness;
@@ -438,7 +437,7 @@ double* VascularTree::localOptimization(double * point, int segment, int steps){
 				}
 			}
 			else {
-				double fitness = calculateMC();
+				double fitness = calculateTumourousFitness();
 				if(fitness > bestFitness) {
 					localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
 					bestFitness = fitness;
@@ -460,7 +459,7 @@ double* VascularTree::localOptimization(double * point, int segment, int steps){
 				}
 			}
 			else {
-				double fitness = calculateMC();
+				double fitness = calculateTumourousFitness();
 				if(fitness > bestFitness) {
 					localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
 					bestFitness = fitness;
@@ -482,7 +481,7 @@ double* VascularTree::localOptimization(double * point, int segment, int steps){
 				}
 			}
 			else {
-				double fitness = calculateMC();
+				double fitness = calculateTumourousFitness();
 				if(fitness > bestFitness) {
 					localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
 					bestFitness = fitness;
@@ -504,7 +503,7 @@ double* VascularTree::localOptimization(double * point, int segment, int steps){
 				}
 			}
 			else {
-				double fitness = calculateMC();
+				double fitness = calculateTumourousFitness();
 				if(fitness > bestFitness) {
 					localBest[0] = test[0]; localBest[1] = test[1]; localBest[2] = test[2];
 					bestFitness = fitness;
@@ -553,7 +552,7 @@ bool VascularTree::connectCandidate(double* point, int steps){
 	//cout << "connect candidate" << endl;
 	
 	if(!validateCandidate(point, -1)) {
-		cout<<"Candiate is too close to an existing segment"<<endl;
+		cout<<"Candidate is too close to an existing segment"<<endl;
 		return false;	//candiate is too close to an existing segment
 	}
 	
@@ -569,7 +568,7 @@ bool VascularTree::connectCandidate(double* point, int steps){
 	
 	double best[3];
 	bool foundSolution = false;
-	double bestFitness = 1e200;
+	double bestFitness = tumour ? -1e200 : 1e200;
 	int bestSegment = 0;
 	
 	map<int, double> distances;
@@ -606,39 +605,23 @@ bool VascularTree::connectCandidate(double* point, int steps){
 			return false;
 		candidateSegments[j] = closest;
 	}
-
-	//DECIDE IF BIRUFACTION, TRIFURCATION, OR NO BRANCH
-	int prob = rand()%100;
-	int pathDecision;
-	if (prob <= 5) 
-		pathDecision = 1;
-	else if (prob <= 15)
-		pathDecision = 2;
-	else
-		pathDecision = 3;
 	
 	//try the first 'closestNeighbours' segments
 	int count = 0;
 	double* test;
-	if(pathDecision == 3)
-		for(j = 0; j < numCandidates && count < closestNeighbours; j++){
-			test = localOptimization(point, candidateSegments[j], steps);
-			if(test != NULL){
-				count++;
-				if(test[3] < bestFitness){
-					best[0] = test[0]; best[1] = test[1]; best[2] = test[2];
-					bestSegment = candidateSegments[j];
-					bestFitness = test[3];
-					foundSolution = true;
-				}
+	for(j = 0; j < numCandidates && count < closestNeighbours; j++){
+		test = localOptimization(point, candidateSegments[j], steps);
+		if(test != NULL){
+			count++;
+			if(tumour ? test[3] > bestFitness : test[3] < bestFitness){
+				best[0] = test[0]; best[1] = test[1]; best[2] = test[2];
+				bestSegment = candidateSegments[j];
+				bestFitness = test[3];
+				foundSolution = true;
 			}
-			delete test;
 		}
-	else if (pathDecision == 2)
-		cout<<"Would create a trifurcation here..."<<endl;
-	else
-		cout<<"Would not branch out here..."<<endl;
-	
+		delete test;
+	}
 	delete candidateSegments;
 
 	if(!foundSolution)
@@ -671,36 +654,56 @@ void VascularTree::buildTree(){
 
 		// If generating tumour vasculature within healthy tree, manipulate parameters and switch objective function
 		if (partialTumour) {
-			for(string region: oxMap->hypoxic_region_vector) {
-				// Get strings from zero_demand_vector and convert them into integers
-				stringstream stream(region);
-				vector<int> coordinates;
-				int temp;
-				while (stream >> temp) {
-					coordinates.push_back(temp);
-				}
+			string tortuous_region = oxMap->hypoxic_region_vector[0];
+			string dense_region = oxMap->hypoxic_region_vector[3];
+			// Get strings from hypoxic_region_vector and hypoxic_value_vector and convert them into integers
+			stringstream tortuous_stream(tortuous_region);
+			stringstream dense_stream(dense_region);
+			vector<int> tortuous_coordinates;
+			vector<int> dense_coordinates;
+			int temp1;
+			int temp2;
+			while (dense_stream >> temp1) {
+				dense_coordinates.push_back(temp1);
+			}
+			while (tortuous_stream >> temp2) {
+				tortuous_coordinates.push_back(temp2);
+			}
+			double ox_demand = oxMap->hypoxic_map[dense_region];
+			double ox_demand2 = oxMap->hypoxic_map[tortuous_region];
 
-				// Check if candidate node falls near immediate border of the necrotic region
-				// LOGIC: If node falls between necrotic regions x and y borders or within 5 units outside of them,
-				//			increase blood viscosity (thicker vessels) and decrease minDistance (more dense)
-				int buffer = 3;
-				if (( ((abs(cand[0] - coordinates[0]) <= buffer) || (abs(cand[0] - coordinates[3]) <= buffer)
-				|| (cand[0] >= coordinates[0] && cand[0] <= coordinates[3]))
-				&& ((abs(cand[1] - coordinates[1]) <= buffer) || (abs(cand[1] - coordinates[4]) <= buffer)
-				|| (cand[1] >= coordinates[1] && cand[1] <= coordinates[4])) )) {
-					tumour = true;
-					rho = 0.036;
-					minDistance = 1;
-				}
+			// Check if candidate node falls near immediate border of the necrotic region
+			// LOGIC: If node falls near the necrotic regions' x,y and z borders,
+			//			increase blood viscosity (thicker vessels) and decrease minDistance (more dense)
+			int buffer = 3;
+			if ( (dense_coordinates[0] <= cand[0] && cand[0] <= dense_coordinates[3])
+			&& (dense_coordinates[1] <= cand[1] && cand[1] <= dense_coordinates[4]) 
+			&& (dense_coordinates[2] <= cand[2] && cand[2] <= dense_coordinates[5]) )
+			{
+				tumour = true;
+				rho = 0.036;
+				minDistance = 1;
+				closestNeighbours = 2;
+			}
+			// Check if candidate nodes fall in the outer region of the hypoxic region (in the space between the outer hypoxic region and the inner region)
+			// LOGIC: If the node falls within the aforementioned space, 
+			else if ((tortuous_coordinates[0] <= cand[0] && cand[0] <= tortuous_coordinates[3])
+			&& (tortuous_coordinates[1] <= cand[1]  && cand[1] <= tortuous_coordinates[4]) 
+			&& (tortuous_coordinates[2] <= cand[2] && cand[2] <= tortuous_coordinates[5]))
+			{
+				tumour = false;
+				rho = 0.036;
+				minDistance = 3;
+				closestNeighbours = 5;
 
-				// If the candidate node does not fall under the above conditions, it is part of the healthy tree,
-				// so reset the parameters to their original values (need a solution that isn't hardcoded as it is below)
-				// Perhaps define a set of variables to hold the original values?
-				else {
-					tumour = false;
-					rho = 0.0036;
-					minDistance = 5;
-				}
+			}
+			// If the candidate node does not fall under the above conditions, it is part of the healthy tree,
+			// so reset the parameters to their original values (need a solution that isn't hardcoded as it is below)
+			else {
+				tumour = false;
+				rho = 0.0036;
+				minDistance = 5;
+				closestNeighbours = 5;
 			}
 		}
 		if(connectCandidate(cand, 50)){
@@ -709,7 +712,5 @@ void VascularTree::buildTree(){
 		}
 		
 	}
-	
 	calculateRadius();
-	
 }

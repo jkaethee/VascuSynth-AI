@@ -107,7 +107,7 @@ public:
 	double calculateFitness();
 
 	//calculate the material cost
-	double calculateMC();
+	double calculateTumourousFitness();
 	
 	//When used by local optimization, ignored is the segment to connect to
 	//otherwise it should be -1;
