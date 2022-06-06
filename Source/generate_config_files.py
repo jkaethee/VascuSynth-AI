@@ -158,16 +158,16 @@ def generate_and_write_oxygen_demand_gradient(file):
     # Randomly picking a region to have the hypoxic region
     demand = 1
     demand_increment = 0.1
-    box_increment = 3
+    box_increment = round(random.uniform(1, 3), 2)
     # Bottom right corner coordinates
     b_right_corner_x = random.randint(0, 40)
     b_right_corner_y = random.randint(0, 40)
     b_right_corner_z = random.randint(0, 40)
 
     # Top left corner coordinates
-    t_left_corner_x = b_right_corner_x + 60
-    t_left_corner_y = b_right_corner_y + 60
-    t_left_corner_z = b_right_corner_z + 60
+    t_left_corner_x = round(b_right_corner_x + box_increment*20, 2)
+    t_left_corner_y = round(b_right_corner_y + box_increment*20, 2)
+    t_left_corner_z = round(b_right_corner_z + box_increment*20, 2)
 
     # Loop to write the gradient to the text file
     while (demand > 0):
@@ -183,12 +183,15 @@ def generate_and_write_oxygen_demand_gradient(file):
             file.write(str(demand) + "\n")
              # Make a smaller box within the previous box
             b_right_corner_x += box_increment; b_right_corner_y += box_increment; b_right_corner_z += box_increment
-            t_left_corner_x -= box_increment; t_left_corner_y -= box_increment; t_left_corner_z -= box_increment 
+            t_left_corner_x -= box_increment; t_left_corner_y -= box_increment; t_left_corner_z -= box_increment
+
+            b_right_corner_x = round(b_right_corner_x, 2); b_right_corner_y = round(b_right_corner_y, 2); b_right_corner_z = round(b_right_corner_z, 2)
+            t_left_corner_x = round(t_left_corner_x,2); t_left_corner_y = round(t_left_corner_y, 2); t_left_corner_z = round(t_left_corner_z, 2)
 
 def main():
     os.chdir('/home/jathushan/Desktop/VascuSynth/HT_Trees')
     # Define number of trees to generate config files for
-    num_of_trees = 3
+    num_of_trees = 1
     # Define parameters for generating normal vascular tres. These values are found in Table 1 of:
     # M. Kociński, A. Klepaczko, A. Materka, M. Chekenya, and A. Lundervold, 
     #   “3D image texture analysis of simulated and real-world vascular trees,” 
@@ -197,8 +200,8 @@ def main():
     term_pressure = 60000
     rho = 0.0036
     # The parameters below were determined through experimentation for generating suitable normal vascular trees
-    min_distance = 4
-    num_nodes = 800
+    min_distance = 5
+    num_nodes = 500
     
     # Create paramFiles.txt to hold all the parameter text files
     paramFiles = open(os.getcwd()+"/paramFiles.txt", "w")
