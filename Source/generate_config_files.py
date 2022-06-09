@@ -60,7 +60,6 @@ def generate_parameter_file(p_num=1,
                 completion. This flag triggers the generated tree to be loaded in napari, a multi-dimensional image viewer for Python,
                 without any user input. The user can then rotate and zoom into the 3D structure as required.       
     """
-    os.chdir('/home/jathushan/Desktop/VascuSynth/HT_Trees')
 
     print("Creating parameter file #" + str(p_num)+"...")
     file_name = os.getcwd()+"/p" + str(p_num) + ".txt"
@@ -189,7 +188,7 @@ def generate_and_write_oxygen_demand_gradient(file):
             t_left_corner_x = round(t_left_corner_x,2); t_left_corner_y = round(t_left_corner_y, 2); t_left_corner_z = round(t_left_corner_z, 2)
 
 def main():
-    os.chdir('/home/jathushan/Desktop/VascuSynth/HT_Trees')
+    os.chdir('../HT_Trees')
     # Define number of trees to generate config files for
     num_of_trees = 1
     # Define parameters for generating normal vascular tres. These values are found in Table 1 of:

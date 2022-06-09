@@ -1,12 +1,9 @@
 from skimage import io
 import numpy as np
-import pyvista as pv
 import napari
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import sys
 from skimage.util import random_noise
-from datetime import datetime
 
 def normalize_image(matrix):
     norm = np.linalg.norm(matrix)
