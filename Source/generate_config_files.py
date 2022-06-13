@@ -1,4 +1,6 @@
 import os
+import sys
+import subprocess
 from numpy import random
 
 def generate_parameter_file(p_num=1,
@@ -17,8 +19,7 @@ def generate_parameter_file(p_num=1,
                             num_nodes = 200,
                             voxel_width = 0.04,
                             closest_neighbours = 5,
-                            tumour_flag = 0,
-                            partial_tumour_flag = 1,
+                            partial_tumour_flag = False,
                             debug_flag = 0):
     """
     Creates text files containing the various parameters required by VascuSynth for tree generation as well as
@@ -50,8 +51,6 @@ def generate_parameter_file(p_num=1,
     voxel_width (float): the width of a cubed voxel for the supply and oxygenation map volume in mm.
     closest_neighbours (int): the number of branches closest to the candidate node to be considered for supplying the candidate
                 terminal node. 
-    tumour_flag (int bool): a flag that is set to true (1) when the user wants to generate a vascular tree that is purely tumourous.
-                This will likely be removed in future work as it is only relevant for testing how tumourous generation is performing.
     partial_tumour_flag (int bool): a flag that is set to true (1) when the user wishes to generate a tree that has a tumour within
                 normal vasculature. Enabling this flag will cause the generator to switch between normal and tumourous parameters
                 during tree generation, leading to chaotic vasculature near the hypoxic tumour region and normal, organized vasculature
@@ -93,8 +92,7 @@ def generate_parameter_file(p_num=1,
         file.write("VOXEL_WIDTH: " + str(voxel_width)+"\n")
         # Write the closest neighbours parameter
         file.write("CLOSEST_NEIGHBOURS: " + str(closest_neighbours) + "\n")
-        # Wite the binary flags for TUMOUR, PARTIAL_TUMOUR, and DEBUG mode
-        file.write("TUMOUR: " + str(tumour_flag) + "\n")
+        # Wite the binary flags for PARTIAL_TUMOUR, and DEBUG mode
         file.write("PARTIAL_TUMOUR: " + str(partial_tumour_flag) + "\n")
         file.write("DEBUG: " + str(debug_flag) + "\n")
 
@@ -188,9 +186,35 @@ def generate_and_write_oxygen_demand_gradient(file):
             t_left_corner_x = round(t_left_corner_x,2); t_left_corner_y = round(t_left_corner_y, 2); t_left_corner_z = round(t_left_corner_z, 2)
 
 def main():
-    os.chdir('../HT_Trees')
+    print('Welcome to the config generation script for the modified version of VascuSynth!')
+    print('We will begin by defining the parameters for the trees to be built')
+
+    # Define if vascular trees to be generated are healthy or contain a tumourous region
+    while True:
+        tumour_flag = input("Are the trees healthy or tumourous? Please enter 0 for HEALTHY or 1 for TUMOUROUS: ")
+        try:
+            {'0': False, '1': True}[tumour_flag]
+        except KeyError:
+            print('Please enter either 0 or 1!')
+            continue
+        break
+    # Change directories to the corresponding folder for the trees
+    if (tumour_flag == '1'): os.chdir('../Tumourous_Trees')
+    else: os.chdir('../Healthy_Trees')
+
     # Define number of trees to generate config files for
-    num_of_trees = 1
+    while True:
+        num_of_trees = input("How many trees would you like to generate config files for? Please enter a positive integer value: ")
+        try:
+            num_of_trees = int(num_of_trees)
+        except ValueError:
+            print('Please enter a integer value!')
+            continue
+        if (num_of_trees >= 0):
+            break
+        else:
+            print('Please enter a POSITIVE integer value!')
+
     # Define parameters for generating normal vascular tres. These values are found in Table 1 of:
     # M. Kociński, A. Klepaczko, A. Materka, M. Chekenya, and A. Lundervold, 
     #   “3D image texture analysis of simulated and real-world vascular trees,” 
@@ -199,13 +223,25 @@ def main():
     term_pressure = 60000
     rho = 0.0036
     # The parameters below were determined through experimentation for generating suitable normal vascular trees
-    min_distance = 5
-    num_nodes = 500
-    
+    min_distance = 4
+
+    # Define the number of nodes for each tree
+    while True:
+        num_nodes = input("How many nodes should each tree have? Note that increasing this value increases the runtime. Please enter a positive integer value: ")
+        try:
+            num_nodes = int(num_nodes)
+        except ValueError:
+            print('Please enter a integer value!')
+            continue
+        if (num_nodes >= 0):
+            break
+        else:
+            print('Please enter a POSITIVE integer value!')
+
     # Create paramFiles.txt to hold all the parameter text files
-    paramFiles = open(os.getcwd()+"/paramFiles.txt", "w")
+    paramFiles = open("./paramFiles.txt", "w")
     # Create imageNames.txt to hold all the image folder names
-    imageNames = open(os.getcwd()+"/imageNames.txt", "w")
+    imageNames = open("./imageNames.txt", "w")
 
     # Create supplyMap text file (will use the default supply map provided by VascuSynth)
     with open(os.getcwd()+"/sMap.txt", "w") as file:
@@ -228,8 +264,29 @@ def main():
                                 term_pressure=term_pressure,
                                 rho=rho,
                                 min_distance=min_distance,
-                                num_nodes=num_nodes)
+                                num_nodes=num_nodes,
+                                partial_tumour_flag=tumour_flag)
         generate_tumourous_oxygen_demand_map(map_num = tree_num)
+
+    # Close text files to avoid errors
+    imageNames.close()
+    paramFiles.close()
+    
+    #  Prompt the user to run VascuSynth with these new config files
+    while True:
+        run_flag = input("Would you like to run the VascuSynth program now? Please enter 0 for NO or 1 for YES: ")
+        try:
+            {'0': False, '1': True}[run_flag]
+        except KeyError:
+            print('Please enter either 0 or 1!')
+            continue
+        break
+
+    if run_flag == '1':
+        subprocess.run(['../Build/VascuSynth', 'paramFiles.txt', 'imageNames.txt', '0.04'])
+    else: 
+        sys.exit()
+        
 
 if __name__=="__main__":
     main()

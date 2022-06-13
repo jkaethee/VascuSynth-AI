@@ -12,10 +12,9 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip && \
     pip install --no-cache-dir -r Source/requirements.txt && \
-    mkdir Build && mkdir HT_Trees 
+    mkdir Build && mkdir Tumourous_Trees && mkdir Healthy_Trees 
 
 CMD cd Build &&\
     cmake ../Source &&\
     make &&\
-    cd ../Source && python3 generate_config_files.py && \
-    cd ../HT_Trees && ../Build/VascuSynth paramFiles.txt imageNames.txt 0.04
+    cd ../Source && python3 generate_config_files.py

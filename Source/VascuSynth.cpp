@@ -82,28 +82,24 @@ using namespace std;
  * @throws string exception if the file cannot be read
  */
 vector<string> * readFileLines(const char * filename){
-	
 	ifstream oFile;
 	oFile.open(filename, ios::in);
 	vector<string> * lines = new vector<string>;
 	string line;
 		
 	if(oFile.is_open()){
-	
 		while(!oFile.eof()){
 			getline(oFile, line);
 			string copy = line;
-			lines->push_back(copy);
+			if(!(line.compare("") == 0)) lines->push_back(copy);
 		}
 		
 		oFile.close();
 		
 	} else {
-		throw "Could not open file " + ( (string) filename)+"s";
+		throw "Could not open file " + ( (string) filename);
 	}
-	
 	return lines;
-	
 }
 
 
@@ -217,7 +213,6 @@ VascularTree * buildTree(const char * filename){
     bool closestNeighboursSet = false;
     bool supplyMapFileNameSet = false;
     bool oxygenMapFileNameSet = false;
-	bool tumourSet = false;
 	bool debugSet = false;
 	bool partialTumourSet = false;
 	
@@ -325,10 +320,7 @@ VascularTree * buildTree(const char * filename){
 		} else if (name.compare("RANDOM_SEED") == 0){
 			 
 			randomSeed = atoi(value.c_str());
-			
-		} else if (name.compare("TUMOUR") == 0) {
-			tumour = atoi(value.c_str());
-			tumourSet = true;
+
 		} else if (name.compare("PARTIAL_TUMOUR") == 0) {
 			partialTumour = atoi(value.c_str());
 			partialTumourSet = true;
@@ -342,7 +334,7 @@ VascularTree * buildTree(const char * filename){
         
     //make sure that we have everything defined
     if (perfSet && pperfSet && ptermSet && qperfSet && rhoSet && gammaSet && lambdaSet && muSet && minDistanceSet && numNodesSet && voxelWidthSet 
-	&& closestNeighboursSet && supplyMapFileNameSet && oxygenMapFileNameSet && tumourSet && partialTumourSet && debugSet) {
+	&& closestNeighboursSet && supplyMapFileNameSet && oxygenMapFileNameSet && partialTumourSet && debugSet) {
     
         //load the supply map
         sm = new SupplyMap();
@@ -366,7 +358,7 @@ VascularTree * buildTree(const char * filename){
 
         //TODO: should probably check and make sure everything is defined
         //and throw an error if it is not (and catch the error in the main function)
-        VascularTree *vt = new VascularTree(om, perf, pperf, pterm, qperf, rho, gamma, lambda, mu, minDistance, numNodes, voxelWidth, closestNeighbours, tumour, partialTumour, debug);
+        VascularTree *vt = new VascularTree(om, perf, pperf, pterm, qperf, rho, gamma, lambda, mu, minDistance, numNodes, voxelWidth, closestNeighbours, partialTumour, debug);
         vt->buildTree();
         
         return vt;
@@ -657,7 +649,6 @@ void printTreeStructure(VascularTree * vt, const char * filePath){
  * which will contain the 2D slices and the GXL file.
  */
 int main(int argc, char** argv){
-
 	if (argc < 4) {
 		//not enough parameters specified
 		cout << "An error has occured: incorrect number of arguments" << endl;
@@ -667,7 +658,6 @@ int main(int argc, char** argv){
 	
     try {
 		chrono::steady_clock::time_point begin = chrono::steady_clock::now();
-
         //read the param files and image name files
         vector<string> *paramFiles = readFileLines(argv[1]);
         vector<string> *imageNameFiles = readFileLines(argv[2]);
@@ -683,9 +673,7 @@ int main(int argc, char** argv){
         for(int m = 0; m < paramFilesSize; m++){
             
             string paramFile = paramFiles->at(m);
-			// Do not proceed with attempting to build the tree if there is a blank line being read from the paramFile
-			if (paramFile.empty()) continue;
-            string rootDirectory = imageNameFiles->at(m);
+		    string rootDirectory = imageNameFiles->at(m);
 
             for(int i = 4; i < argc; i++) {
                 noiseFiles[i-4] = argv[i];

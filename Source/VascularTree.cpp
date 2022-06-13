@@ -63,7 +63,7 @@ using namespace std;
 /**  
  * 	Constructor
  */				
-VascularTree::VascularTree(OxygenationMap * _oxMap, double* _perf, double _Pperf, double _Pterm, double _Qperf, double _rho, double _gamma, double _lambda, double _mu, double _minDistance, int _numNodes, double _voxelWidth, int _closestNeighbours, bool _tumour, bool _partialTumour, bool _debug){
+VascularTree::VascularTree(OxygenationMap * _oxMap, double* _perf, double _Pperf, double _Pterm, double _Qperf, double _rho, double _gamma, double _lambda, double _mu, double _minDistance, int _numNodes, double _voxelWidth, int _closestNeighbours, bool _partialTumour, bool _debug){
 	oxMap = _oxMap;
 	perf = new double[3]; perf[0] = _perf[0]; perf[1] = _perf[1];perf[2] = _perf[2];
 	Pperf = _Pperf;
@@ -79,7 +79,7 @@ VascularTree::VascularTree(OxygenationMap * _oxMap, double* _perf, double _Pperf
 	numNodes = _numNodes;
 	
 	closestNeighbours = _closestNeighbours;
-	tumour = _tumour;
+	tumour = false;
 	partialTumour = _partialTumour;
 	debug = _debug;
 
