@@ -5,7 +5,7 @@ Preet S. Jassi, May 5 2011
 Please visit the Insight Journal and read the paper here http://www.insight-journal.org/browse/publication/794 for proper instructions on how to compile and execute VascuSynth.  VascuSynth requires CMake and ITK.  Instructions on how to install CMake and ITK are in the paper above.
 
 ## Motivation
-This repository is a modified version of VascuSynth to generate 3D vascular trees with tumourous regions. The goal is to generate realistic MIPs of 3D vasculature trees with hypoxic regions that reflect key features such as tortuosity, dilated vessels, and dense branching in contrast to the organized nature of healthy vasculature.
+This repository is a modified version of VascuSynth to generate 3D vascular trees with tumourous regions. The goal is to generate realistic MIPs of 3D vasculature trees with hypoxic regions that reflect key features such as tortuosity, dilated vessels, and dense branching in contrast to the organized nature of healthy vasculature. Future work involves generated large datasets to evaluate the ability of AI networks to identify and segment tumourous vasculature from these images (intended to simulate real-world ultrasound acquisition).
 
 ## Build and Generate Vascular Trees
 This application can be built and run using [Docker](https://docs.docker.com/get-docker/).
