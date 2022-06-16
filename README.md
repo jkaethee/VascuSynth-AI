@@ -15,7 +15,7 @@ First, clone the repo:
 
 `git clone https://github.com/jkaethee/VascuSynth_copy.git`  
 
-Then, start Docker, navigate to the `Source` directory with the Dockerfile, and build the image:  
+Then, start Docker and build the image:  
 
 `docker build -t vascusynth .`  
 
@@ -30,7 +30,7 @@ The user can now follow the interactive prompts and generate their desired vascu
 To get the files generated within the container onto the user's host system, use the following command:  
 `docker cp <container_name>:/VascuSynth/<Tumourous_Trees or Healthy_Trees> ../`
 
-Note that the container name can be found by running `docker ps -a` and that the above command assumes the user is still in the `Source` directory.
+Note that the container name can be found by running `docker ps -a`.  
 If successful, the user should see the folders and files corresponding to the generated trees on their host system.
 
 ## Capture Maximum Intensity Projections of 3D Vascular Trees
