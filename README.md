@@ -28,7 +28,7 @@ The user can now follow the interactive prompts and generate their desired vascu
 
 ### Copying files from container to host
 To get the files generated within the container onto the user's host system, use the following command:  
-`docker cp <container_name>:/VascuSynth/<Tumourous_Trees or Healthy_Trees> ../`
+`docker cp <container_name>:/VascuSynth/<Tumourous_Trees or Healthy_Trees> ./`
 
 Note that the container name can be found by running `docker ps -a`.  
 If successful, the user should see the folders and files corresponding to the generated trees on their host system.
