@@ -186,6 +186,17 @@ def generate_and_write_oxygen_demand_gradient(file):
             t_left_corner_x = round(t_left_corner_x,2); t_left_corner_y = round(t_left_corner_y, 2); t_left_corner_z = round(t_left_corner_z, 2)
 
 def main():
+    print("""\
+                            __             _   _       ____    ___  
+ /\   /\__ _ ___  ___ _   _/ _\_   _ _ __ | |_| |__   |___ \  / _ \ 
+ \ \ / / _` / __|/ __| | | \ \| | | | '_ \| __| '_ \    __) || | | |
+  \ V / (_| \__ \ (__| |_| |\ \ |_| | | | | |_| | | |  / __/ | |_| |
+   \_/ \__,_|___/\___|\__,_\__/\__, |_| |_|\__|_| |_| |_____(_)___/ 
+                               |___/                                
+    
+    A program to generate 3D vascular trees!
+
+        """)
     print('Welcome to the config generation script for the modified version of VascuSynth!')
     print('We will begin by defining the parameters for the trees to be built')
 
@@ -204,7 +215,7 @@ def main():
 
     # Define number of trees to generate config files for
     while True:
-        num_of_trees = input("How many trees would you like to generate config files for? Please enter a positive integer value: ")
+        num_of_trees = input("How many unique trees would you like to build? Please enter a positive integer value: ")
         try:
             num_of_trees = int(num_of_trees)
         except ValueError:
