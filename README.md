@@ -13,22 +13,30 @@ This application can be built and run using [Docker](https://docs.docker.com/get
 
 First, clone the repo:  
 
-`git clone https://github.com/jkaethee/VascuSynth_copy.git`  
+```
+git clone https://github.com/jkaethee/VascuSynth_copy.git
+```  
 
 Then, start Docker and build the image:  
 
-`docker build -t vascusynth .`  
+```
+docker build -t vascusynth .
+```  
 
 Finally, spin up a container in interactive mode to run the application:  
 
-`docker run -it vascusynth`
+```
+docker run -it vascusynth
+```
 
 The user can now follow the interactive prompts and generate their desired vascular trees!
 > Tumourous vascular trees can be found in the `/VascuSynth/Tumourous_Trees` directory, while healthy vascular trees can be found in the `/VascuSynth/Healthy_Trees` directory (both of these paths are on the container file system)
 
 ### Copying files from container to host
 To get the files generated within the container onto the user's host system, use the following command:  
-`docker cp <container_name>:/VascuSynth/<Tumourous_Trees or Healthy_Trees> ./`
+```
+docker cp <container_name>:/VascuSynth/<Tumourous_Trees or Healthy_Trees> ./
+```
 
 Note that the container name can be found by running `docker ps -a`.  
 If successful, the user should see the folders and files corresponding to the generated trees on their host system.
@@ -36,10 +44,14 @@ If successful, the user should see the folders and files corresponding to the ge
 ## Capture Maximum Intensity Projections of 3D Vascular Trees
 This section utilizes Jupyter Notebook. To install Jupyter Notebook, run the following command in your terminal:  
 
-`pip install notebook`
+```
+pip install notebook
+```
 
 Then, navigate to the `Source` directory and run:  
 
-`jupyter notebook`
+```
+jupyter notebook
+```
 
 This should run the the notebook and allow you to view and run the `MIP_Generator.ipynb` file. This notebook uses 3D slicer to view, rotate, and capture MIP images for every 10 degrees of rotation in the pitch, yaw, and roll axis. Ensure that the folder directories and names correspond with those in your VascuSynth folder before running the cells in the notebook.
