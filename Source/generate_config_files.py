@@ -127,9 +127,9 @@ def pick_perforation_point():
     perf_point = str(x_coord) + " " + str(y_coord) + " " + str(z_coord)
     return perf_point
 
-def generate_tumourous_oxygen_demand_map(map_num=1):
+def generate_oxygen_demand_map(map_num=1, tumour_flag='1'):
     """
-    Creates text files containing oxygen demand maps for tumourous vasculature
+    Creates text files containing oxygen demand maps for either healthy or tumourous vasculature
 
     num_maps (int): number of oxygen demand maps to be generated
     """
@@ -142,8 +142,9 @@ def generate_tumourous_oxygen_demand_map(map_num=1):
         file.write("0 0 0 100 100 100\n")
         file.write("1\n")
 
-        # TODO: Generate a smooth gradient that ends with a nerotic region in the center
-        generate_and_write_oxygen_demand_gradient(file)
+        # Generates a smooth gradient that ends with a nerotic region in the center
+        if (tumour_flag == '1'):
+            generate_and_write_oxygen_demand_gradient(file)
 
 def generate_and_write_oxygen_demand_gradient(file):
     """
@@ -277,7 +278,7 @@ def main():
                                 min_distance=min_distance,
                                 num_nodes=num_nodes,
                                 partial_tumour_flag=tumour_flag)
-        generate_tumourous_oxygen_demand_map(map_num = tree_num)
+        generate_oxygen_demand_map(map_num = tree_num, tumour_flag=tumour_flag)
 
     # Close text files to avoid errors
     imageNames.close()
