@@ -3,6 +3,8 @@ import sys
 import subprocess
 from numpy import random
 
+vol_size="300"
+edge = int(vol_size)
 def generate_parameter_file(p_num=1,
                             supply_map = "sMap.txt",
                             oxygen_map = "oxMap_0.txt",
@@ -113,15 +115,15 @@ def pick_perforation_point():
     x_coord, y_coord, z_coord = 0, 0, 0
     if wall == 0 or wall == 3:
         x_coord = 0 if wall == 0 else 100
-        y_coord = random.randint(1,99)
-        z_coord = random.randint(1,99)
+        y_coord = random.randint(1,edge-1)
+        z_coord = random.randint(1,edge-1)
     elif wall == 1 or wall == 4:
-        x_coord = random.randint(1,99)
+        x_coord = random.randint(1,edge-1)
         y_coord = 0 if wall == 1 else 100
-        z_coord = random.randint(1,99)
+        z_coord = random.randint(1,edge-1)
     else:
-        x_coord = random.randint(1,99)
-        y_coord = random.randint(1,99)
+        x_coord = random.randint(1,edge-1)
+        y_coord = random.randint(1,edge-1)
         z_coord = 0 if wall == 2 else 100
     
     perf_point = str(x_coord) + " " + str(y_coord) + " " + str(z_coord)
@@ -136,10 +138,10 @@ def generate_oxygen_demand_map(map_num=1, tumour_flag='1'):
     print('Creating Oxygen Demand Map #'+str(map_num)+"...")
     with open(os.getcwd()+"/oxMap_" + str(map_num) + ".txt", "w") as file:
         # Defines dimensions of the cube (should match the actual volume)
-        file.write("100 100 100\n")
+        file.write(f"{vol_size} {vol_size} 100\n")
         # Defines demand of 1 for entire cube, which will have certain sections
         # overwritten in the following lines
-        file.write("0 0 0 100 100 100\n")
+        file.write(f"0 0 0 {vol_size} {vol_size} 100\n")
         file.write("1\n")
 
         # Generates a smooth gradient that ends with a nerotic region in the center
@@ -156,16 +158,19 @@ def generate_and_write_oxygen_demand_gradient(file):
     # Randomly picking a region to have the hypoxic region
     demand = 1
     demand_increment = 0.1
-    box_increment = round(random.uniform(1, 3), 2)
+    box_increment = 3
+
+    print('box_increment:',box_increment)
     # Bottom right corner coordinates
-    b_right_corner_x = random.randint(0, 40)
-    b_right_corner_y = random.randint(0, 40)
+    b_right_corner_x = random.randint(0, edge*0.4)
+    b_right_corner_y = random.randint(0, edge*0.4)
     b_right_corner_z = random.randint(0, 40)
 
     # Top left corner coordinates
-    t_left_corner_x = round(b_right_corner_x + box_increment*20, 2)
-    t_left_corner_y = round(b_right_corner_y + box_increment*20, 2)
-    t_left_corner_z = round(b_right_corner_z + box_increment*20, 2)
+    temp = 1.5
+    t_left_corner_x = round(b_right_corner_x + temp*(edge/5))
+    t_left_corner_y = round(b_right_corner_y + temp*(edge/5))
+    t_left_corner_z = round(b_right_corner_z + 3*20)
 
     # Loop to write the gradient to the text file
     while (demand > 0):
@@ -175,16 +180,16 @@ def generate_and_write_oxygen_demand_gradient(file):
         demand = round(demand, 1)
         if demand==0:
             # This value is close to zero but not exactly zero to avoid completely void region in center
-            file.write(str(0.0) + "\n")
+            file.write(str(0.001) + "\n")
             break
         else:
             file.write(str(demand) + "\n")
-             # Make a smaller box within the previous box
-            b_right_corner_x += box_increment; b_right_corner_y += box_increment; b_right_corner_z += box_increment
-            t_left_corner_x -= box_increment; t_left_corner_y -= box_increment; t_left_corner_z -= box_increment
+            # Make a smaller box within the previous box
+            b_right_corner_x += box_increment; b_right_corner_y += box_increment; b_right_corner_z += 3
+            t_left_corner_x -= box_increment; t_left_corner_y -= box_increment; t_left_corner_z -= 3
 
-            b_right_corner_x = round(b_right_corner_x, 2); b_right_corner_y = round(b_right_corner_y, 2); b_right_corner_z = round(b_right_corner_z, 2)
-            t_left_corner_x = round(t_left_corner_x,2); t_left_corner_y = round(t_left_corner_y, 2); t_left_corner_z = round(t_left_corner_z, 2)
+            b_right_corner_x = round(b_right_corner_x); b_right_corner_y = round(b_right_corner_y); b_right_corner_z = round(b_right_corner_z)
+            t_left_corner_x = round(t_left_corner_x); t_left_corner_y = round(t_left_corner_y); t_left_corner_z = round(t_left_corner_z)
 
 def main():
     print("""\
@@ -257,8 +262,8 @@ def main():
 
     # Create supplyMap text file (will use the default supply map provided by VascuSynth)
     with open(os.getcwd()+"/sMap.txt", "w") as file:
-        file.write("100 100 100 4 \n")
-        file.write("0 0 0 100 100 100 \n" )
+        file.write(f"{vol_size} {vol_size} 100 4 \n")
+        file.write(f"0 0 0 {vol_size} {vol_size} 100 \n" )
         file.write("0.65 0.34 0.01 7 \n")
 
     for tree_num in range(num_of_trees):

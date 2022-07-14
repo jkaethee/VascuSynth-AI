@@ -548,7 +548,7 @@ bool VascularTree::inVolume(double* point){
  *  function is elected.
  */
 bool VascularTree::connectCandidate(double* point, int steps){
-	
+
 	//cout << "connect candidate" << endl;
 	
 	if(!validateCandidate(point, -1)) {
@@ -559,6 +559,7 @@ bool VascularTree::connectCandidate(double* point, int steps){
 	if(nt.nodes.size() == 1){
 		
 		if(!oxMap->visible(nt.getPos(0), point)) {
+			cout<<"Candidate is not visible from source"<<endl;
 			return false;			
 		}
 		
