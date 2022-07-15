@@ -3,7 +3,7 @@ import sys
 import subprocess
 from numpy import random
 
-vol_size="300"
+vol_size="125"
 edge = int(vol_size)
 def generate_parameter_file(p_num=1,
                             supply_map = "sMap.txt",
@@ -158,7 +158,7 @@ def generate_and_write_oxygen_demand_gradient(file):
     # Randomly picking a region to have the hypoxic region
     demand = 1
     demand_increment = 0.1
-    box_increment = 3
+    box_increment = round(random.uniform(1,2),2)
 
     print('box_increment:',box_increment)
     # Bottom right corner coordinates
@@ -167,9 +167,8 @@ def generate_and_write_oxygen_demand_gradient(file):
     b_right_corner_z = random.randint(0, 40)
 
     # Top left corner coordinates
-    temp = 1.5
-    t_left_corner_x = round(b_right_corner_x + temp*(edge/5))
-    t_left_corner_y = round(b_right_corner_y + temp*(edge/5))
+    t_left_corner_x = round(b_right_corner_x + box_increment*(edge/5))
+    t_left_corner_y = round(b_right_corner_y + box_increment*(edge/5))
     t_left_corner_z = round(b_right_corner_z + 3*20)
 
     # Loop to write the gradient to the text file
