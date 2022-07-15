@@ -3,7 +3,7 @@ import sys
 import subprocess
 from numpy import random
 
-vol_size="125"
+vol_size="150"
 edge = int(vol_size)
 def generate_parameter_file(p_num=1,
                             supply_map = "sMap.txt",
@@ -114,12 +114,12 @@ def pick_perforation_point():
     wall = random.randint(0,5)
     x_coord, y_coord, z_coord = 0, 0, 0
     if wall == 0 or wall == 3:
-        x_coord = 0 if wall == 0 else 100
+        x_coord = 0 if wall == 0 else edge
         y_coord = random.randint(1,edge-1)
         z_coord = random.randint(1,edge-1)
     elif wall == 1 or wall == 4:
         x_coord = random.randint(1,edge-1)
-        y_coord = 0 if wall == 1 else 100
+        y_coord = 0 if wall == 1 else edge
         z_coord = random.randint(1,edge-1)
     else:
         x_coord = random.randint(1,edge-1)
@@ -158,7 +158,7 @@ def generate_and_write_oxygen_demand_gradient(file):
     # Randomly picking a region to have the hypoxic region
     demand = 1
     demand_increment = 0.1
-    box_increment = round(random.uniform(1,2),2)
+    box_increment = round(random.uniform(1,1.5),2)
 
     print('box_increment:',box_increment)
     # Bottom right corner coordinates
