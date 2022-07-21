@@ -61,10 +61,11 @@ for val in demands:
 
 # Create a 3D Numpy array that represents the oxygen demand map of the tree
 # Every 6 iterations in the regions list results in 1 iteration in the values list (Following VascuSynth file convention)
-oxygen_demand_cube= np.ones((101, 101, 101))
+oxygen_demand_cube= np.ones((int(sys.argv[5]), int(sys.argv[6]), int(sys.argv[7])))
 
 for idx, value in enumerate(values):
     region = regions[idx*6:idx*6 + 6]
+    print('region: ', region)
     for i in range(region[0],region[3]+1):
         for j in range(region[1], region[4]+1):
             for k in range(region[2], region[5]+1):

@@ -747,8 +747,8 @@ int main(int argc, char** argv){
             delete td;
             delete vt;
 
-			int argc = 5;
-			wchar_t * argv[5];
+			int argc = 8;
+			wchar_t * argv[8];
 
 			// Send root directory path to the Python script
 			const char * orig = rootDirectory.c_str();
@@ -791,10 +791,25 @@ int main(int argc, char** argv){
 			wchar_t* wcstringThree = const_cast <wchar_t*>(widestrValuesPointer);
 			argv[3] = wcstringThree;
 
+			// Convert to a wchar_t*
 			wstring widestrTreeNum = to_wstring(m);
 			const wchar_t* widestrTreeNumPointer = widestrTreeNum.c_str();
 			wchar_t* wcstringFour = const_cast <wchar_t*>(widestrTreeNumPointer);
 			argv[4] = wcstringFour;
+
+			// Convert to a wchar_t*
+			wstring totalVolumeSizeX= to_wstring(vt->oxMap->dim[0] + 1);
+			wstring totalVolumeSizeY = to_wstring(vt->oxMap->dim[1] + 1);
+			wstring totalVolumeSizeZ = to_wstring(vt->oxMap->dim[2] + 1);
+			const wchar_t* widestrTotalVolumeSizeXPointer = totalVolumeSizeX.c_str();
+			const wchar_t* widestrTotalVolumeSizeYPointer = totalVolumeSizeY.c_str();
+			const wchar_t* widestrTotalVolumeSizeZPointer = totalVolumeSizeZ.c_str();
+			wchar_t* wcstringFive = const_cast <wchar_t*>(widestrTotalVolumeSizeXPointer);
+			wchar_t* wcstringSix = const_cast <wchar_t*>(widestrTotalVolumeSizeYPointer);
+			wchar_t* wcstringSeven = const_cast <wchar_t*>(widestrTotalVolumeSizeZPointer);
+			argv[5] = wcstringFive;
+			argv[6] = wcstringSix;
+			argv[7] = wcstringSeven;
 
 			PySys_SetArgv(argc,argv);
 			FILE *file = fopen("../Source/generate_mip.py", "r");
