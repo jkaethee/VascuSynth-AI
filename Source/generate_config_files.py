@@ -2,8 +2,9 @@ import os
 import sys
 import subprocess
 from numpy import random
+from math import sqrt
 
-vol_size="150"
+vol_size="300"
 edge = int(vol_size)
 def generate_parameter_file(p_num=1,
                             supply_map = "sMap.txt",
@@ -158,17 +159,18 @@ def generate_and_write_oxygen_demand_gradient(file):
     # Randomly picking a region to have the hypoxic region
     demand = 1
     demand_increment = 0.1
-    box_increment = round(random.uniform(1,1.5),2)
+    percent_of_total = round(random.uniform(0.05, 0.20), 2)
 
-    print('box_increment:',box_increment)
+    print('percent of total volume:', percent_of_total)
     # Bottom right corner coordinates
     b_right_corner_x = random.randint(0, edge*0.4)
     b_right_corner_y = random.randint(0, edge*0.4)
     b_right_corner_z = random.randint(0, 40)
 
     # Top left corner coordinates
-    t_left_corner_x = round(b_right_corner_x + box_increment*(edge/5))
-    t_left_corner_y = round(b_right_corner_y + box_increment*(edge/5))
+    distance = sqrt(((edge * edge * 100) * percent_of_total)/100)
+    t_left_corner_x = round(b_right_corner_x + distance)
+    t_left_corner_y = round(b_right_corner_y + distance)
     t_left_corner_z = round(b_right_corner_z + 3*20)
 
     # Loop to write the gradient to the text file
@@ -184,8 +186,8 @@ def generate_and_write_oxygen_demand_gradient(file):
         else:
             file.write(str(demand) + "\n")
             # Make a smaller box within the previous box
-            b_right_corner_x += box_increment; b_right_corner_y += box_increment; b_right_corner_z += 3
-            t_left_corner_x -= box_increment; t_left_corner_y -= box_increment; t_left_corner_z -= 3
+            b_right_corner_x += 3; b_right_corner_y += 3; b_right_corner_z += 3
+            t_left_corner_x -= 3; t_left_corner_y -= 3; t_left_corner_z -= 3
 
             b_right_corner_x = round(b_right_corner_x); b_right_corner_y = round(b_right_corner_y); b_right_corner_z = round(b_right_corner_z)
             t_left_corner_x = round(t_left_corner_x); t_left_corner_y = round(t_left_corner_y); t_left_corner_z = round(t_left_corner_z)
