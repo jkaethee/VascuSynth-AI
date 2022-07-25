@@ -4,7 +4,7 @@ import subprocess
 from numpy import random
 from math import sqrt
 
-vol_size="300"
+vol_size="200"
 edge = int(vol_size)
 def generate_parameter_file(p_num=1,
                             supply_map = "sMap.txt",
@@ -171,7 +171,9 @@ def generate_and_write_oxygen_demand_gradient(file):
     distance = sqrt(((edge * edge * 100) * percent_of_total)/100)
     t_left_corner_x = round(b_right_corner_x + distance)
     t_left_corner_y = round(b_right_corner_y + distance)
-    t_left_corner_z = round(b_right_corner_z + 3*20)
+    t_left_corner_z = round(b_right_corner_z + 60)
+
+    increment = (t_left_corner_x -b_right_corner_x) * 0.05
 
     # Loop to write the gradient to the text file
     while (demand > 0):
@@ -186,8 +188,8 @@ def generate_and_write_oxygen_demand_gradient(file):
         else:
             file.write(str(demand) + "\n")
             # Make a smaller box within the previous box
-            b_right_corner_x += 3; b_right_corner_y += 3; b_right_corner_z += 3
-            t_left_corner_x -= 3; t_left_corner_y -= 3; t_left_corner_z -= 3
+            b_right_corner_x += increment; b_right_corner_y += increment; b_right_corner_z += 3
+            t_left_corner_x -= increment; t_left_corner_y -= increment; t_left_corner_z -= 3
 
             b_right_corner_x = round(b_right_corner_x); b_right_corner_y = round(b_right_corner_y); b_right_corner_z = round(b_right_corner_z)
             t_left_corner_x = round(t_left_corner_x); t_left_corner_y = round(t_left_corner_y); t_left_corner_z = round(t_left_corner_z)
