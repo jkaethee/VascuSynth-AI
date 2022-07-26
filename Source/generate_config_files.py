@@ -4,8 +4,8 @@ import subprocess
 from numpy import random
 from math import sqrt
 
-vol_size="200"
-edge = int(vol_size)
+vol_size="200" # This variable refers to the dimensions of the total volume in the x and y axis
+int_vol_size = int(vol_size) # This variable just holds the integer version of vol_size
 def generate_parameter_file(p_num=1,
                             supply_map = "sMap.txt",
                             oxygen_map = "oxMap_0.txt",
@@ -115,16 +115,16 @@ def pick_perforation_point():
     wall = random.randint(0,5)
     x_coord, y_coord, z_coord = 0, 0, 0
     if wall == 0 or wall == 3:
-        x_coord = 0 if wall == 0 else edge
-        y_coord = random.randint(1,edge-1)
-        z_coord = random.randint(1,edge-1)
+        x_coord = 0 if wall == 0 else int_vol_size
+        y_coord = random.randint(1,int_vol_size-1)
+        z_coord = random.randint(1,int_vol_size-1)
     elif wall == 1 or wall == 4:
-        x_coord = random.randint(1,edge-1)
-        y_coord = 0 if wall == 1 else edge
-        z_coord = random.randint(1,edge-1)
+        x_coord = random.randint(1,int_vol_size-1)
+        y_coord = 0 if wall == 1 else int_vol_size
+        z_coord = random.randint(1,int_vol_size-1)
     else:
-        x_coord = random.randint(1,edge-1)
-        y_coord = random.randint(1,edge-1)
+        x_coord = random.randint(1,int_vol_size-1)
+        y_coord = random.randint(1,int_vol_size-1)
         z_coord = 0 if wall == 2 else 100
     
     perf_point = str(x_coord) + " " + str(y_coord) + " " + str(z_coord)
@@ -163,12 +163,12 @@ def generate_and_write_oxygen_demand_gradient(file):
 
     print('percent of total volume:', percent_of_total)
     # Bottom right corner coordinates
-    b_right_corner_x = random.randint(0, edge*0.4)
-    b_right_corner_y = random.randint(0, edge*0.4)
+    b_right_corner_x = random.randint(0, int_vol_size*0.4)
+    b_right_corner_y = random.randint(0, int_vol_size*0.4)
     b_right_corner_z = random.randint(0, 40)
 
     # Top left corner coordinates
-    distance = sqrt(((edge * edge * 100) * percent_of_total)/100)
+    distance = sqrt(((int_vol_size * int_vol_size * 100) * percent_of_total)/100)
     t_left_corner_x = round(b_right_corner_x + distance)
     t_left_corner_y = round(b_right_corner_y + distance)
     t_left_corner_z = round(b_right_corner_z + 60)
