@@ -4,8 +4,12 @@ import subprocess
 from numpy import random
 from math import sqrt
 
-vol_size="200" # This variable refers to the dimensions of the total volume in the x and y axis
-int_vol_size = int(vol_size) # This variable just holds the integer version of vol_size
+# vol_dim_str is a list that holds the dimensions of the total volume [X, Y, Z] in a string format
+vol_dim_str = ["200", "200", "100"]
+vol_dim = []
+for dim in vol_dim_str:
+    vol_dim.append(int(dim))
+
 def generate_parameter_file(p_num=1,
                             supply_map = "sMap.txt",
                             oxygen_map = "oxMap_0.txt",
@@ -110,22 +114,22 @@ def pick_perforation_point():
     # the "x,y and z walls" correspond to the walls perpendicular to those axes. For example,
     # the "z wall" refers to the top and bottom faces of the cube (perpendicular to the z-axis)
 
-    # x = 0 --> wall = 0, y = 0 --> wall = 1, z = 0 --> wall = 2
-    # x = 100 --> wall = 3, y = 100 --> wall = 4, z = 100 --> wall = 5
+    # wall = 0 --> x = 0, wall = 1 --> y = 0, wall = 2 --> z = 0
+    # wall = 3 --> x = vol_dim[0], wall = 4 --> y = vol_dim[1], wall = 5 --> vol_dim[2]
     wall = random.randint(0,5)
     x_coord, y_coord, z_coord = 0, 0, 0
     if wall == 0 or wall == 3:
-        x_coord = 0 if wall == 0 else int_vol_size
-        y_coord = random.randint(1,int_vol_size-1)
-        z_coord = random.randint(1,int_vol_size-1)
+        x_coord = 0 if wall == 0 else vol_dim[0]
+        y_coord = random.randint(1, vol_dim[1]-1)
+        z_coord = random.randint(1, vol_dim[2]-1)
     elif wall == 1 or wall == 4:
-        x_coord = random.randint(1,int_vol_size-1)
-        y_coord = 0 if wall == 1 else int_vol_size
-        z_coord = random.randint(1,int_vol_size-1)
+        x_coord = random.randint(1, vol_dim[0]-1)
+        y_coord = 0 if wall == 1 else vol_dim[1]
+        z_coord = random.randint(1,vol_dim[2]-1)
     else:
-        x_coord = random.randint(1,int_vol_size-1)
-        y_coord = random.randint(1,int_vol_size-1)
-        z_coord = 0 if wall == 2 else 100
+        x_coord = random.randint(1, vol_dim[0]-1)
+        y_coord = random.randint(1,vol_dim[1]-1)
+        z_coord = 0 if wall == 2 else vol_dim[2]
     
     perf_point = str(x_coord) + " " + str(y_coord) + " " + str(z_coord)
     return perf_point
@@ -139,10 +143,10 @@ def generate_oxygen_demand_map(map_num=1, tumour_flag='1'):
     print('Creating Oxygen Demand Map #'+str(map_num)+"...")
     with open(os.getcwd()+"/oxMap_" + str(map_num) + ".txt", "w") as file:
         # Defines dimensions of the cube (should match the actual volume)
-        file.write(f"{vol_size} {vol_size} 100\n")
+        file.write(f"{vol_dim[0]} {vol_dim[1]} {vol_dim[2]}\n")
         # Defines demand of 1 for entire cube, which will have certain sections
         # overwritten in the following lines
-        file.write(f"0 0 0 {vol_size} {vol_size} 100\n")
+        file.write(f"0 0 0 {vol_dim[0]} {vol_dim[1]} {vol_dim[2]}\n")
         file.write("1\n")
 
         # Generates a smooth gradient that ends with a nerotic region in the center
@@ -160,17 +164,20 @@ def generate_and_write_oxygen_demand_gradient(file):
     demand = 1
     demand_increment = 0.1
     percent_of_total = round(random.uniform(0.05, 0.20), 2)
-
     print('percent of total volume:', percent_of_total)
+    
     # Bottom right corner coordinates
-    b_right_corner_x = random.randint(0, int_vol_size*0.4)
-    b_right_corner_y = random.randint(0, int_vol_size*0.4)
+    b_right_corner_x = random.randint(0, vol_dim[0]*0.4)
+    b_right_corner_y = random.randint(0, vol_dim[1]*0.4)
     b_right_corner_z = random.randint(0, 40)
 
     # Top left corner coordinates
-    distance = sqrt(((int_vol_size * int_vol_size * 100) * percent_of_total)/100)
-    t_left_corner_x = round(b_right_corner_x + distance)
-    t_left_corner_y = round(b_right_corner_y + distance)
+    # Compute the volume of the cube, multiply by the hypoxic percentage, divide by 100 to remove the Z component, 
+    # and square root to get the distance for the X and Y components of the hypoxic region cube.
+    length_x_y = sqrt(((vol_dim[0]* vol_dim[1] * 100) * percent_of_total)/100)  
+
+    t_left_corner_x = round(b_right_corner_x + length_x_y)
+    t_left_corner_y = round(b_right_corner_y + length_x_y)
     t_left_corner_z = round(b_right_corner_z + 60)
 
     increment = (t_left_corner_x -b_right_corner_x) * 0.05
@@ -265,8 +272,8 @@ def main():
 
     # Create supplyMap text file (will use the default supply map provided by VascuSynth)
     with open(os.getcwd()+"/sMap.txt", "w") as file:
-        file.write(f"{vol_size} {vol_size} 100 4 \n")
-        file.write(f"0 0 0 {vol_size} {vol_size} 100 \n" )
+        file.write(f"{vol_dim[0]} {vol_dim[1]} {vol_dim[2]} 4 \n")
+        file.write(f"0 0 0 {vol_dim[0]} {vol_dim[1]} {vol_dim[2]} \n" )
         file.write("0.65 0.34 0.01 7 \n")
 
     for tree_num in range(num_of_trees):
