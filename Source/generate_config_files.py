@@ -5,7 +5,7 @@ from numpy import random
 from math import sqrt
 
 # vol_dim_str is a list that holds the dimensions of the total volume [X, Y, Z] in a string format
-vol_dim_str = ["200", "200", "100"]
+vol_dim_str = ["200", "200", "200"]
 vol_dim = []
 for dim in vol_dim_str:
     vol_dim.append(int(dim))
@@ -169,23 +169,20 @@ def generate_and_write_oxygen_demand_gradient(file):
     # Bottom right corner coordinates
     b_right_corner_x = random.randint(0, vol_dim[0]*0.4)
     b_right_corner_y = random.randint(0, vol_dim[1]*0.4)
-    b_right_corner_z = random.randint(0, 40)
+    b_right_corner_z = random.randint(0, vol_dim[2]*0.4)
 
-    # Set the length of the z-axis to be 60 units long.
-    length_z = 60
 
-    # Compute the volume of the cube, multiply by the hypoxic percentage, divide by Z-axis length to remove the Z component, 
-    # and square root to get the distance for the X and Y components of the hypoxic region cube.
-    length_x_y = sqrt(((vol_dim[0] * vol_dim[1] * vol_dim[2]) * percent_of_total)/length_z)
+    # Compute the volume of the cube, multiply by the hypoxic percentage 
+    # and cube root to get the distance for the X, Y, and Z components of the hypoxic region cube.
+    length_x_y_z = ((vol_dim[0] * vol_dim[1] * vol_dim[2]) * percent_of_total) ** (1/3)
     
     # Top left corner coordinates
-    t_left_corner_x = round(b_right_corner_x + length_x_y)
-    t_left_corner_y = round(b_right_corner_y + length_x_y)
-    t_left_corner_z = round(b_right_corner_z + length_z)
+    t_left_corner_x = round(b_right_corner_x + length_x_y_z)
+    t_left_corner_y = round(b_right_corner_y + length_x_y_z)
+    t_left_corner_z = round(b_right_corner_z + length_x_y_z)
 
     # t_left_corner_y and b_right_corner_y could be used here too since the x length == y length
-    decrement_x_y = (t_left_corner_x - b_right_corner_x) * 0.05
-    decrement_z = (t_left_corner_z - b_right_corner_z) * 0.05
+    decrement_x_y_z = (t_left_corner_x - b_right_corner_x) * 0.05
 
     # Loop to write the gradient to the text file
     while (demand > 0):
@@ -200,8 +197,8 @@ def generate_and_write_oxygen_demand_gradient(file):
         else:
             file.write(str(demand) + "\n")
             # Make a smaller box within the previous box
-            b_right_corner_x += decrement_x_y; b_right_corner_y += decrement_x_y; b_right_corner_z += decrement_z
-            t_left_corner_x -= decrement_x_y; t_left_corner_y -= decrement_x_y; t_left_corner_z -= decrement_z
+            b_right_corner_x += decrement_x_y_z; b_right_corner_y += decrement_x_y_z; b_right_corner_z += decrement_x_y_z
+            t_left_corner_x -= decrement_x_y_z; t_left_corner_y -= decrement_x_y_z; t_left_corner_z -= decrement_x_y_z
 
             b_right_corner_x = round(b_right_corner_x); b_right_corner_y = round(b_right_corner_y); b_right_corner_z = round(b_right_corner_z)
             t_left_corner_x = round(t_left_corner_x); t_left_corner_y = round(t_left_corner_y); t_left_corner_z = round(t_left_corner_z)
