@@ -684,7 +684,6 @@ void VascularTree::buildTree(){
 				tumour = true;
 				rho = 0.036;
 				minDistance = 1;
-				closestNeighbours = 2;
 			}
 			// Check if candidate nodes fall in the outer region of the hypoxic region (in the space between the outer hypoxic region and the inner region)
 			// LOGIC: If the node falls within the aforementioned space, 
@@ -695,7 +694,6 @@ void VascularTree::buildTree(){
 				tumour = false;
 				rho = 0.036;
 				minDistance = 3;
-				closestNeighbours = 5;
 
 			}
 			// If the candidate node does not fall under the above conditions, it is part of the healthy tree,
@@ -704,7 +702,6 @@ void VascularTree::buildTree(){
 				tumour = false;
 				rho = 0.0036;
 				minDistance = 5;
-				closestNeighbours = 5;
 			}
 		}
 		if(connectCandidate(cand, 50)){
