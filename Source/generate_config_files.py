@@ -5,7 +5,7 @@ from numpy import random
 from math import sqrt
 
 # vol_dim_str is a list that holds the dimensions of the total volume [X, Y, Z] in a string format
-vol_dim_str = ["200", "200", "200"]
+vol_dim_str = ["100", "100", "100"]
 vol_dim = []
 for dim in vol_dim_str:
     vol_dim.append(int(dim))
@@ -163,7 +163,7 @@ def generate_and_write_oxygen_demand_gradient(file):
     # Randomly picking a region to have the hypoxic region
     demand = 1
     demand_increment = 0.1
-    percent_of_total = round(random.uniform(0.05, 0.20), 2)
+    percent_of_total = round(random.uniform(0.01, 0.10), 2)
     print('percent of total volume:', percent_of_total)
     
     # Bottom right corner coordinates
@@ -192,7 +192,7 @@ def generate_and_write_oxygen_demand_gradient(file):
         demand = round(demand, 1)
         if demand==0:
             # This value is close to zero but not exactly zero to avoid completely void region in center
-            file.write(str(0.001) + "\n")
+            file.write(str(0.0) + "\n")
             break
         else:
             file.write(str(demand) + "\n")
@@ -252,7 +252,7 @@ def main():
     term_pressure = 60000
     rho = 0.0036
     # The parameters below were determined through experimentation for generating suitable normal vascular trees
-    min_distance = 4
+    min_distance = 5
 
     # Define the number of nodes for each tree
     while True:
