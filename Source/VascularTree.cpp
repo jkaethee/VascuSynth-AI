@@ -655,8 +655,11 @@ void VascularTree::buildTree(){
 
 		// If generating tumour vasculature within healthy tree, manipulate parameters and switch objective function
 		if (partialTumour) {
+			// The first 3 layers of the hypoxic region (starting from the outside) are represented by tortuous_region and tortuous_coordinates
+			// The last 7 layers of the hypoxic region (starting from the outside) are represented by dense_region and dense_coordinates
 			string tortuous_region = oxMap->hypoxic_region_vector[0];
 			string dense_region = oxMap->hypoxic_region_vector[3];
+
 			// Get strings from hypoxic_region_vector and hypoxic_value_vector and convert them into integers
 			stringstream tortuous_stream(tortuous_region);
 			stringstream dense_stream(dense_region);
@@ -670,8 +673,6 @@ void VascularTree::buildTree(){
 			while (tortuous_stream >> temp2) {
 				tortuous_coordinates.push_back(temp2);
 			}
-			double ox_demand = oxMap->hypoxic_map[dense_region];
-			double ox_demand2 = oxMap->hypoxic_map[tortuous_region];
 
 			// Check if candidate node falls near immediate border of the necrotic region
 			// LOGIC: If node falls near the necrotic regions' x,y and z borders,
@@ -684,6 +685,7 @@ void VascularTree::buildTree(){
 				tumour = true;
 				rho = 0.036;
 				minDistance = 1;
+				closestNeighbours = 2;
 			}
 			// Check if candidate nodes fall in the outer region of the hypoxic region (in the space between the outer hypoxic region and the inner region)
 			// LOGIC: If the node falls within the aforementioned space, 
@@ -694,6 +696,7 @@ void VascularTree::buildTree(){
 				tumour = false;
 				rho = 0.036;
 				minDistance = 3;
+				closestNeighbours = 5;
 
 			}
 			// If the candidate node does not fall under the above conditions, it is part of the healthy tree,
@@ -701,7 +704,8 @@ void VascularTree::buildTree(){
 			else {
 				tumour = false;
 				rho = 0.0036;
-				minDistance = 5;
+				minDistance = 4;
+				closestNeighbours = 5;
 			}
 		}
 		if(connectCandidate(cand, 50)){

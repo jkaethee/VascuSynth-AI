@@ -291,9 +291,8 @@ void OxygenationMap::loadMap(string filename){
 
 			double value = atof(line.c_str());
 
-			// Store regions of hypoxic demand in hypoxic_region vector and values in hypoxic_value_vector
-			// Coordinates will be seperated by one space as per convention in the
-			// oxygenation map file
+			// Store string regions of hypoxic demand in hypoxic_region vector and values in hypoxic_value_vector
+			// Coordinates will be seperated by one space as per convention in the oxygen demand map file
 			if (value != 1) {
 				string hypoxic_region;
 				for (i = 0; i < 6; i++) {

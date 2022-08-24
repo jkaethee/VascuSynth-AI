@@ -772,8 +772,6 @@ int main(int argc, char** argv){
 			for(string region:vt->oxMap->hypoxic_region_vector) {
 				totalRegionString += region;
 			}
-
-			// Convert to a wchar_t*
 			wstring widestrRegions = wstring(totalRegionString.begin(), totalRegionString.end());
 			const wchar_t* widestrRegionsPointer = widestrRegions.c_str();
 			wchar_t* wcstringTwo = const_cast <wchar_t*>(widestrRegionsPointer);
@@ -784,20 +782,18 @@ int main(int argc, char** argv){
 			for(string value:vt->oxMap->hypoxic_value_vector) {
 				totalValueString += value;
 			}
-
-			// Convert to a wchar_t*
 			wstring widestrValues = wstring(totalValueString.begin(), totalValueString.end());
 			const wchar_t* widestrValuesPointer = widestrValues.c_str();
 			wchar_t* wcstringThree = const_cast <wchar_t*>(widestrValuesPointer);
 			argv[3] = wcstringThree;
 
-			// Convert to a wchar_t*
+			// Send the tree number to the Python Script
 			wstring widestrTreeNum = to_wstring(m);
 			const wchar_t* widestrTreeNumPointer = widestrTreeNum.c_str();
 			wchar_t* wcstringFour = const_cast <wchar_t*>(widestrTreeNumPointer);
 			argv[4] = wcstringFour;
 
-			// Convert to a wchar_t*
+			// Send the dimensions of the total volume to the Python Script
 			wstring totalVolumeSizeX= to_wstring(vt->oxMap->dim[0] + 1);
 			wstring totalVolumeSizeY = to_wstring(vt->oxMap->dim[1] + 1);
 			wstring totalVolumeSizeZ = to_wstring(vt->oxMap->dim[2] + 1);
