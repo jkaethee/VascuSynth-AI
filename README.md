@@ -1,4 +1,4 @@
-# VascuSynth_copy
+# VascuSynth_AI
 VascuSynth - Vascular Tree Synthesis Software
 Preet S. Jassi, May 5 2011
 
