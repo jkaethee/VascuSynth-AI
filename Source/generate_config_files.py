@@ -163,8 +163,8 @@ def generate_and_write_oxygen_demand_gradient(file):
     # Randomly picking a region to have the hypoxic region
     demand = 1
     demand_increment = 0.1
-    percent_of_total = round(random.uniform(0.01, 0.10), 2)
-    print('percent of total volume:', percent_of_total)
+    percent_of_total = round(random.uniform(0.05, 0.20), 2)
+    print('Percent of total volume as Hypoxic Region:', percent_of_total)
     
     # Bottom right corner coordinates
     b_right_corner_x = random.randint(0, vol_dim[0]*0.4)
@@ -252,7 +252,7 @@ def main():
     term_pressure = 60000
     rho = 0.0036
     # The parameters below were determined through experimentation for generating suitable normal vascular trees
-    min_distance = 5
+    min_distance = 4
 
     # Define the number of nodes for each tree
     while True:
