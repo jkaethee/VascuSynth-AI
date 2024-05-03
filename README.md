@@ -1,6 +1,6 @@
-# VascuSynth_AI
+# VascuSynth-AI
 VascuSynth - Vascular Tree Synthesis Software
-Preet S. Jassi, May 5 2011
+Originally software by Preet S. Jassi, May 5 2011
 
 Please visit the Insight Journal and read the paper here http://www.insight-journal.org/browse/publication/794 for proper instructions on how to compile and execute VascuSynth.  VascuSynth requires CMake and ITK.  Instructions on how to install CMake and ITK are in the paper above.
 
